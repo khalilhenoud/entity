@@ -10,50 +10,47 @@
  */
 #include <assert.h>
 #include <string.h>
+#include <library/allocator/allocator.h>
 #include <entity/c/runtime/font.h>
 #include <entity/c/runtime/font_utils.h>
 
 
-font_t*
-create_font(
-  const char *image_file, 
-  const char *data_file, 
+font_runtime_t*
+create_font_runtime(
+  const font_t* font, 
   const allocator_t* allocator)
 {
-  assert(allocator != NULL);
-  assert(
-    image_file != NULL && 
-    data_file != NULL && 
-    "image file or data file are NULL!");
+  assert(allocator && font);
   
   {
-    font_t* font = (font_t*)allocator->mem_alloc(sizeof(font_t));
-    memset(font, 0, sizeof(font_t));
-    assert(
-      strlen(image_file) < sizeof(font->image_file.data) && 
-      "image_file path does not fit the fixed_str_t data struct!");
-    assert(
-      strlen(data_file) < sizeof(font->data_file.data) && 
-      "data_file path does not fit the fixed_str_t data struct!");
-    memcpy(font->image_file.data, image_file, strlen(image_file));
-    memcpy(font->data_file.data, data_file, strlen(data_file));
-    return font;
+    font_runtime_t* runtime = 
+      (font_runtime_t*)allocator->mem_alloc(sizeof(font_runtime_t));
+    memset(runtime, 0, sizeof(font_runtime_t));
+    memcpy(
+      runtime->font.image_file.data, 
+      font->image_file.data, 
+      strlen(font->image_file.data));
+    memcpy(
+      runtime->font.data_file.data, 
+      font->data_file.data, 
+      strlen(font->data_file.data));
+    return runtime;
   }
 }
 
 void
-free_font(
-  font_t* font, 
+free_font_runtime(
+  font_runtime_t* runtime, 
   const allocator_t* allocator)
 {
   assert(allocator != NULL);
-  assert(font != NULL && "font is NULL!");
-  allocator->mem_free(font);
+  assert(runtime != NULL && "runtime is NULL!");
+  allocator->mem_free(runtime);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 uint32_t
-get_glyph_count(const font_t* font)
+get_glyph_count(const font_runtime_t* font)
 {
   return 
     (font->image_width/font->cell_width) * 
@@ -61,20 +58,20 @@ get_glyph_count(const font_t* font)
 }
 
 uint32_t
-get_font_column_count(const font_t* font)
+get_font_column_count(const font_runtime_t* font)
 {
   return font->image_width/font->cell_width;
 }
 
 uint32_t
-get_font_row_count(const font_t* font)
+get_font_row_count(const font_runtime_t* font)
 {
   return font->image_height/font->cell_height;
 }
 
 void
 get_glyph_bounds(
-  const font_t* font, 
+  const font_runtime_t* font, 
   const char c, 
   glyph_bounds_t *out)
 {
@@ -88,7 +85,7 @@ get_glyph_bounds(
 
 uint32_t 
 has_glyph(
-  const font_t* font, 
+  const font_runtime_t* font, 
   const char c)
 {
  uint32_t total = get_glyph_count(font);

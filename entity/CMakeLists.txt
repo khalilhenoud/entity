@@ -6,8 +6,9 @@ project(entity VERSION 1.0)
 # add the executable
 add_library(${PROJECT_NAME} SHARED
         ./source/c/mesh/mesh_utils.c
+        ./source/c/misc/font_utils.c
         ./source/c/runtime/font_utils.c
-        ./source/c/runtime/image_utils.c
+        ./source/c/runtime/texture_utils.c
         ./source/c/scene/camera_utils.c
         ./source/c/scene/node_utils.c
         ./source/c/scene/scene_utils.c

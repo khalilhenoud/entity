@@ -13,6 +13,7 @@
 
 #include <stdint.h>
 #include <library/string/fixed_string.h>
+#include <entity/c/misc/font.h>
 
 #define FONT_GLYPH_COUNT 256
 
@@ -27,10 +28,9 @@ struct glyph_info_t {
 } glyph_info_t;
 
 typedef
-struct font_t {
-  fixed_str_t image_file;
-  fixed_str_t data_file;
-
+struct font_runtime_t {
+  // TODO(khalil): Should this be a copy or a pointer/handle/index.
+  font_t font;
   uint32_t image_width, image_height;
   uint32_t cell_width, cell_height;
   uint32_t font_width, font_height;
@@ -38,7 +38,8 @@ struct font_t {
 
   glyph_info_t glyphs[FONT_GLYPH_COUNT];
   glyph_bounds_t bounds[FONT_GLYPH_COUNT];
-} font_t;
+} font_runtime_t;
+
 
 
 #endif

@@ -13,6 +13,7 @@
 
 #include <stdint.h>
 #include <library/string/fixed_string.h>
+#include <entity/c/mesh/texture.h>
 
 
 typedef
@@ -26,17 +27,17 @@ enum image_format_t {
   RUNTIME_IMAGE_FORMAT_A
 } image_format_t;
 
-// TODO: currently for image/font we are setting the path first and only filling
-// out the rest of the members after the loaders have been called. I want to 
-// remove this 2 step process (callbacks is a good solution to this).
 typedef
-struct image_t {
-  fixed_str_t path;
+struct texture_runtime_t {
+  // TODO(khalil): should this be a pointer of an index, or as is.
+  texture_t texture;
   uint32_t width;
   uint32_t height;
   image_format_t format;
   uint8_t* buffer;
   size_t buffer_size;
-} image_t;
+} texture_runtime_t;
+
+typedef texture_runtime_t image_t;
 
 #endif

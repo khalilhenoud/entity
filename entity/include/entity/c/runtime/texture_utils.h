@@ -19,27 +19,35 @@ extern "C" {
 #include <entity/c/internal/module.h>
 
 
-typedef struct image_t image_t;
+typedef struct texture_t texture_t;
+typedef struct texture_runtime_t texture_runtime_t;
+typedef texture_runtime_t image_t;
 typedef struct allocator_t allocator_t;
 
 ENTITY_API
-image_t*
-create_image(const char* path, const allocator_t* allocator);
+texture_runtime_t*
+create_texture_runtime(
+  const texture_t* texture, 
+  const allocator_t* allocator);
 
 ENTITY_API
 void
-free_image(image_t* image, const allocator_t* allocator);
+free_texture_runtime(
+  texture_runtime_t* texture_runtime, 
+  const allocator_t* allocator);
 
 ENTITY_API
 void
-allocate_image_buffer(
-  image_t* image, 
+allocate_runtime_buffer(
+  texture_runtime_t* texture_runtime, 
   const size_t buffer_size, 
   const allocator_t* allocator);
 
 ENTITY_API
 void
-free_image_buffer(image_t* image, const allocator_t* allocator);
+free_runtime_buffer(
+  texture_runtime_t* texture_runtime, 
+  const allocator_t* allocator);
 
 ////////////////////////////////////////////////////////////////////////////////
 ENTITY_API
