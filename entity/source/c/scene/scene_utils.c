@@ -49,6 +49,8 @@ free_scene(scene_t* scene, const allocator_t* allocator)
     allocator->mem_free(scene->texture_repo.textures);
   if (scene->font_repo.count)
     allocator->mem_free(scene->font_repo.fonts);
+  if (scene->camera_repo.count)
+    allocator->mem_free(scene->camera_repo.cameras);
 
   allocator->mem_free(scene);
 }
