@@ -23,6 +23,7 @@ struct payload_indices_t {
   uint32_t *indices;
 } payload_indices_t;
 
+// TODO: fixed_str should be replaced, this is 128 bytes.
 typedef
 struct node_t {
   fixed_str_128_t name;
