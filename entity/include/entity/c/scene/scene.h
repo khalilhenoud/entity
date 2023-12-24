@@ -12,10 +12,10 @@
 #define SCENE_H
 
 #include <stdint.h>
-#include <library/string/fixed_string.h>
 #include <math/c/matrix4f.h>
 
 
+typedef struct string_t string_t;
 typedef struct mesh_t mesh_t;
 typedef struct material_t material_t;
 typedef struct texture_t texture_t;
@@ -64,7 +64,7 @@ struct node_repo_t {
 // should support here.
 typedef
 struct scene_t {
-  fixed_str_128_t name;
+  string_t* name;
   node_repo_t node_repo;        // root is: node_repo.nodes[0];
   mesh_repo_t mesh_repo;
   material_repo_t material_repo;

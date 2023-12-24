@@ -11,13 +11,13 @@
 #ifndef MISC_FONT_H
 #define MISC_FONT_H
 
-#include <library/string/fixed_string.h>
 
+typedef struct string_t string_t;
 
 typedef
 struct font_t {
-  fixed_str_t image_file;
-  fixed_str_t data_file;
+  string_t* image_file;
+  string_t* data_file;
 } font_t;
 
 #endif

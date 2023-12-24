@@ -11,13 +11,13 @@
 #ifndef SCENE_TEXTURE_H
 #define SCENE_TEXTURE_H
 
-#include <library/string/fixed_string.h>
 
+typedef struct string_t string_t;
 
 // TODO: utils file?
 typedef 
 struct texture_t {
-  fixed_str_t path;
+  string_t* path;
 } texture_t;
 
 #endif

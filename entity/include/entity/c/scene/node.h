@@ -12,9 +12,10 @@
 #define SCENE_NODE_H
 
 #include <stdint.h>
-#include <library/string/fixed_string.h>
 #include <math/c/matrix4f.h>
 
+
+typedef struct string_t string_t;
 
 // Indicies into the scene payloads.
 typedef
@@ -26,7 +27,7 @@ struct payload_indices_t {
 // TODO: fixed_str should be replaced, this is 128 bytes.
 typedef
 struct node_t {
-  fixed_str_128_t name;
+  string_t* name;
   matrix4f transform;
   payload_indices_t meshes;
   payload_indices_t nodes;

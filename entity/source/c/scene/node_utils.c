@@ -10,6 +10,7 @@
  */
 #include <assert.h>
 #include <library/allocator/allocator.h>
+#include <library/string/string.h>
 #include <entity/c/scene/node.h>
 #include <entity/c/scene/node_utils.h>
 
@@ -23,7 +24,7 @@ swap_node_internals(
   assert(to && from && allocator);
   free_node_internal(to, allocator);
 
-  memcpy(to->name.data, from->name.data, sizeof(from->name.data));
+  to->name = create_string(from->name->str, allocator);
   matrix4f_copy(&to->transform, &from->transform);
 
   to->meshes.count = from->meshes.count;
@@ -67,6 +68,8 @@ void
 free_node_internal(node_t* node, const allocator_t* allocator)
 {
   assert(node && allocator);
+
+  free_string(node->name);
 
   if (node->meshes.count) {
     assert(node->meshes.indices);

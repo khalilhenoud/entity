@@ -12,7 +12,6 @@
 #define RUNTIME_FONT_H
 
 #include <stdint.h>
-#include <library/string/fixed_string.h>
 #include <entity/c/misc/font.h>
 
 #define FONT_GLYPH_COUNT 256

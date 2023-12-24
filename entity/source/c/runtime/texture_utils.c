@@ -11,6 +11,7 @@
 #include <assert.h>
 #include <string.h>
 #include <library/allocator/allocator.h>
+#include <library/string/string.h>
 #include <entity/c/mesh/texture.h>
 #include <entity/c/runtime/texture.h>
 #include <entity/c/runtime/texture_utils.h>
@@ -27,16 +28,22 @@ create_texture_runtime(
     texture_runtime_t* runtime = 
       (texture_runtime_t*)allocator->mem_alloc(sizeof(texture_runtime_t));
     memset(runtime, 0, sizeof(texture_runtime_t));
-    memcpy(
-      runtime->texture.path.data, 
-      texture->path.data, 
-      strlen(texture->path.data));
+    runtime->texture.path = create_string(texture->path->str, allocator);
     return runtime;
   }
 }
 
 void
 free_texture_runtime(
+  texture_runtime_t* runtime, 
+  const allocator_t* allocator)
+{
+  free_texture_runtime_internal(runtime, allocator);
+  allocator->mem_free(runtime);
+}
+
+void
+free_texture_runtime_internal(
   texture_runtime_t* runtime, 
   const allocator_t* allocator)
 {
@@ -51,7 +58,8 @@ free_texture_runtime(
     allocator->mem_free(runtime->buffer);
   }
 
-  allocator->mem_free(runtime);
+  if (runtime->texture.path)
+    free_string(runtime->texture.path);
 }
 
 void
@@ -117,7 +125,7 @@ get_image_component_count(const image_t* image)
 void
 get_image_extension(const image_t* image, uint8_t extension[8])
 {
-  uint8_t* at = strrchr(image->texture.path.data, '.');
+  uint8_t* at = strrchr(image->texture.path->str, '.');
   assert(at && "File has no extension '.' separator!");
   assert(strlen(at + 1) < 8 && "Extension is longer than 8 character!");
 

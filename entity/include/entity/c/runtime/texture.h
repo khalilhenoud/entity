@@ -12,7 +12,6 @@
 #define RUNTIME_IMAGE_H
 
 #include <stdint.h>
-#include <library/string/fixed_string.h>
 #include <entity/c/mesh/texture.h>
 
 

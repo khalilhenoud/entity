@@ -90,7 +90,9 @@ free_mesh_internal(
 }
 
 void
-free_mesh(mesh_t* mesh, const allocator_t *allocator)
+free_mesh(
+  mesh_t* mesh, 
+  const allocator_t *allocator)
 {
   free_mesh_internal(mesh, allocator);
   allocator->mem_free(mesh);

@@ -38,6 +38,12 @@ free_texture_runtime(
 
 ENTITY_API
 void
+free_texture_runtime_internal(
+  texture_runtime_t* texture_runtime, 
+  const allocator_t* allocator);
+
+ENTITY_API
+void
 allocate_runtime_buffer(
   texture_runtime_t* texture_runtime, 
   const size_t buffer_size, 

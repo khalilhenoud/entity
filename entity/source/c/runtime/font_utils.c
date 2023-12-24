@@ -11,6 +11,7 @@
 #include <assert.h>
 #include <string.h>
 #include <library/allocator/allocator.h>
+#include <library/string/string.h>
 #include <entity/c/runtime/font.h>
 #include <entity/c/runtime/font_utils.h>
 
@@ -26,14 +27,8 @@ create_font_runtime(
     font_runtime_t* runtime = 
       (font_runtime_t*)allocator->mem_alloc(sizeof(font_runtime_t));
     memset(runtime, 0, sizeof(font_runtime_t));
-    memcpy(
-      runtime->font.image_file.data, 
-      font->image_file.data, 
-      strlen(font->image_file.data));
-    memcpy(
-      runtime->font.data_file.data, 
-      font->data_file.data, 
-      strlen(font->data_file.data));
+    runtime->font.image_file = create_string(font->image_file->str, allocator);
+    runtime->font.data_file = create_string(font->data_file->str, allocator);
     return runtime;
   }
 }
@@ -43,9 +38,19 @@ free_font_runtime(
   font_runtime_t* runtime, 
   const allocator_t* allocator)
 {
+  free_font_runtime_internal(runtime, allocator);
+  allocator->mem_free(runtime);
+}
+
+void
+free_font_runtime_internal(
+  font_runtime_t* runtime, 
+  const allocator_t* allocator)
+{
   assert(allocator != NULL);
   assert(runtime != NULL && "runtime is NULL!");
-  allocator->mem_free(runtime);
+  free_string(runtime->font.image_file);
+  free_string(runtime->font.data_file);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

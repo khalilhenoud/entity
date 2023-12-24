@@ -1,15 +1,15 @@
 /**
- * @file font_utils.h
+ * @file material_utils.h
  * @author khalilhenoud@gmail.com
  * @brief 
  * @version 0.1
- * @date 2023-09-28
+ * @date 2023-12-24
  * 
  * @copyright Copyright (c) 2023
  * 
  */
-#ifndef MISC_FONT_UTILS_H
-#define MISC_FONT_UTILS_H
+#ifndef SCENE_MATERIAL_UTILS_H
+#define SCENE_MATERIAL_UTILS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -19,40 +19,33 @@ extern "C" {
 #include <entity/c/internal/module.h>
 
 
+typedef struct material_t material_t;
 typedef struct allocator_t allocator_t;
-typedef struct font_t font_t;
 
 ENTITY_API
-font_t*
-create_font(
-  const char *image_file, 
-  const char *data_file, 
-  const allocator_t* allocator);
-
-ENTITY_API
-font_t* 
-allocate_font_array(
+material_t* 
+allocate_material_array(
   uint32_t count, 
   const allocator_t* allocator);
 
 ENTITY_API
 void
-free_font_array(
-  font_t* font, 
+free_material_array(
+  material_t* material, 
   uint32_t count,
   const allocator_t* allocator);
 
 ENTITY_API
 void
-free_font_internal(
-  font_t* font, 
+free_material_internal(
+  material_t* material, 
   const allocator_t* allocator);
 
 ENTITY_API
 void
-free_font(
-  font_t* font, 
-  const allocator_t* allocator);
+free_material(
+  material_t* material, 
+  const allocator_t *allocator);
 
 #ifdef __cplusplus
 }

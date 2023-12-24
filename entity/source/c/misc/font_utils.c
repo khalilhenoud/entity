@@ -11,6 +11,7 @@
 #include <assert.h>
 #include <string.h>
 #include <library/allocator/allocator.h>
+#include <library/string/string.h>
 #include <entity/c/misc/font.h>
 #include <entity/c/misc/font_utils.h>
 
@@ -30,16 +31,51 @@ create_font(
   {
     font_t* font = (font_t*)allocator->mem_alloc(sizeof(font_t));
     memset(font, 0, sizeof(font_t));
-    assert(
-      strlen(image_file) < sizeof(font->image_file.data) && 
-      "image_file path does not fit the fixed_str_t data struct!");
-    assert(
-      strlen(data_file) < sizeof(font->data_file.data) && 
-      "data_file path does not fit the fixed_str_t data struct!");
-    memcpy(font->image_file.data, image_file, strlen(image_file));
-    memcpy(font->data_file.data, data_file, strlen(data_file));
+    font->image_file = create_string(image_file, allocator);
+    font->data_file = create_string(data_file, allocator);
     return font;
   }
+}
+
+font_t* 
+allocate_font_array(
+  uint32_t count, 
+  const allocator_t* allocator)
+{
+  assert(count && "do not allocate array of size 0!");
+  assert(allocator);
+
+  {
+    font_t* fonts = (font_t*)allocator->mem_cont_alloc(count, sizeof(font_t));
+    assert(fonts && "Failed to allocate memory");
+    return fonts;
+  }
+}
+
+void
+free_font_array(
+  font_t* fonts, 
+  uint32_t count,
+  const allocator_t* allocator)
+{
+  assert(fonts && count && "trying to free an invalid array!");
+  assert(allocator);
+
+  for (uint32_t i = 0; i < count; ++i)
+    free_font_internal(fonts + i, allocator);
+
+  allocator->mem_free(fonts);
+}
+
+void
+free_font_internal(
+  font_t* font, 
+  const allocator_t* allocator)
+{
+  assert(allocator != NULL);
+  assert(font != NULL && "font is NULL!");
+  free_string(font->image_file);
+  free_string(font->data_file);
 }
 
 void
@@ -47,7 +83,6 @@ free_font(
   font_t* font, 
   const allocator_t* allocator)
 {
-  assert(allocator != NULL);
-  assert(font != NULL && "font is NULL!");
+  free_font_internal(font, allocator);
   allocator->mem_free(font);
 }

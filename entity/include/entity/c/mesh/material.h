@@ -11,11 +11,12 @@
 #ifndef SCENE_MATERIAL_H
 #define SCENE_MATERIAL_H
 
-#include <library/string/fixed_string.h>
 #include <entity/c/mesh/color.h>
 
 #define MAX_TEXTURE_COUNT_PER_MATERIAL          8
 
+
+typedef struct string_t string_t;
 
 // TODO: We need some utils to create arrays and the likes.
 typedef
@@ -34,7 +35,7 @@ struct texture_properties_array_t {
 
 typedef
 struct material_t {
-  fixed_str_128_t name;
+  string_t* name;
   color_rgba_t ambient;
   color_rgba_t diffuse;
   color_rgba_t specular;

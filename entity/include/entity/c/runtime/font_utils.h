@@ -36,6 +36,12 @@ free_font_runtime(
   font_runtime_t* font_runtime, 
   const allocator_t* allocator);
 
+ENTITY_API
+void
+free_font_runtime_internal(
+  font_runtime_t* font_runtime, 
+  const allocator_t* allocator);
+
 ////////////////////////////////////////////////////////////////////////////////
 ENTITY_API
 uint32_t
