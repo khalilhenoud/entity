@@ -35,7 +35,7 @@ create_scene(
     assert(scene && "failed to allocate scene!");
     
     memset(scene, 0, sizeof(scene));
-    scene->name = create_string(name, allocator);
+    scene->name = allocate_string(name, allocator);
 
     return scene;
   }

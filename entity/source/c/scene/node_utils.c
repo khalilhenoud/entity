@@ -24,7 +24,7 @@ swap_node_internals(
   assert(to && from && allocator);
   free_node_internal(to, allocator);
 
-  to->name = create_string(from->name->str, allocator);
+  to->name = allocate_string(from->name->str, allocator);
   matrix4f_copy(&to->transform, &from->transform);
 
   to->meshes.count = from->meshes.count;

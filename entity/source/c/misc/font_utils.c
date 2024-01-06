@@ -31,8 +31,8 @@ create_font(
   {
     font_t* font = (font_t*)allocator->mem_alloc(sizeof(font_t));
     memset(font, 0, sizeof(font_t));
-    font->image_file = create_string(image_file, allocator);
-    font->data_file = create_string(data_file, allocator);
+    font->image_file = allocate_string(image_file, allocator);
+    font->data_file = allocate_string(data_file, allocator);
     return font;
   }
 }

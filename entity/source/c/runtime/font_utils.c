@@ -27,8 +27,8 @@ create_font_runtime(
     font_runtime_t* runtime = 
       (font_runtime_t*)allocator->mem_alloc(sizeof(font_runtime_t));
     memset(runtime, 0, sizeof(font_runtime_t));
-    runtime->font.image_file = create_string(font->image_file->str, allocator);
-    runtime->font.data_file = create_string(font->data_file->str, allocator);
+    runtime->font.image_file = allocate_string(font->image_file->str, allocator);
+    runtime->font.data_file = allocate_string(font->data_file->str, allocator);
     return runtime;
   }
 }
