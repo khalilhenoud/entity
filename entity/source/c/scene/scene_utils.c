@@ -13,6 +13,7 @@
 #include <library/string/string.h>
 #include <entity/c/scene/scene.h>
 #include <entity/c/scene/scene_utils.h>
+#include <entity/c/scene/light_utils.h>
 #include <entity/c/scene/node_utils.h>
 #include <entity/c/mesh/mesh_utils.h>
 #include <entity/c/mesh/material.h>
@@ -50,6 +51,10 @@ free_scene(scene_t* scene, const allocator_t* allocator)
   free_mesh_array(scene->mesh_repo.meshes, scene->mesh_repo.count, allocator);
   free_node_array(scene->node_repo.nodes, scene->node_repo.count, allocator);
   free_font_array(scene->font_repo.fonts, scene->font_repo.count, allocator);
+
+  if (scene->light_repo.count)
+    free_light_array(
+      scene->light_repo.lights, scene->light_repo.count, allocator);
 
   if (scene->material_repo.count)
     free_material_array(

@@ -23,6 +23,8 @@ typedef struct camera_t camera_t;
 typedef struct allocator_t allocator_t;
 typedef struct matrix4f matrix4f;
 
+// NOTE: Since camera_t has no internal dynamic data, array functionality is not
+// required.
 ENTITY_API
 camera_t*
 create_camera(const allocator_t* allocator);

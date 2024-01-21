@@ -12,6 +12,7 @@ add_library(${PROJECT_NAME} SHARED
         ./source/c/runtime/font_utils.c
         ./source/c/runtime/texture_utils.c
         ./source/c/scene/camera_utils.c
+        ./source/c/scene/light_utils.c
         ./source/c/scene/node_utils.c
         ./source/c/scene/scene_utils.c
         ./include/entity/c/internal/module.h

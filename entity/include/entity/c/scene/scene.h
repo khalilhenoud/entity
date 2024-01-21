@@ -22,6 +22,7 @@ typedef struct texture_t texture_t;
 typedef struct node_t node_t;
 typedef struct font_t font_t;
 typedef struct camera_t camera_t;
+typedef struct light_t light_t;
 
 // TODO: These would be replace with a templated dynamic array (in C).
 typedef
@@ -29,6 +30,12 @@ struct mesh_repo_t {
   uint32_t count;
   mesh_t *meshes;
 } mesh_repo_t;
+
+typedef
+struct light_repo_t {
+  uint32_t count;
+  light_t* lights;
+} light_repo_t;
 
 typedef
 struct texture_repo_t {
@@ -66,6 +73,7 @@ typedef
 struct scene_t {
   string_t* name;
   node_repo_t node_repo;        // root is: node_repo.nodes[0];
+  light_repo_t light_repo;
   mesh_repo_t mesh_repo;
   material_repo_t material_repo;
   texture_repo_t texture_repo;
