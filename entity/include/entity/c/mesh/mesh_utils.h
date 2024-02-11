@@ -57,6 +57,10 @@ free_mesh(
 ////////////////////////////////////////////////////////////////////////////////
 ENTITY_API
 mesh_t*
+create_unit_cube(const allocator_t* allocator);
+
+ENTITY_API
+mesh_t*
 create_unit_sphere(const int32_t factor, const allocator_t* allocator);
 
 ENTITY_API
