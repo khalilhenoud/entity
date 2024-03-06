@@ -17,31 +17,6 @@
 #include <entity/c/mesh/mesh_utils.h>
 
 
-void
-swap_mesh_internals(
-  mesh_t* to, 
-  mesh_t* from,
-  const allocator_t* allocator)
-{
-  assert(to && from && allocator);
-  free_mesh_internal(to, allocator);
-
-  to->indices_count = from->indices_count;
-  to->materials = from->materials;
-  to->vertices_count = from->vertices_count;
-
-  to->indices = from->indices;
-  from->indices = NULL;
-  to->normals = from->normals;
-  from->normals = NULL;
-  to->uvs = from->uvs;
-  from->uvs = NULL;
-  to->vertices = from->vertices;
-  from->vertices = NULL;
-
-  free_mesh(from, allocator);
-}
-
 mesh_t* 
 allocate_mesh_array(
   uint32_t count, 
@@ -88,6 +63,8 @@ free_mesh_internal(
     allocator->mem_free(mesh->uvs);
   if (mesh->indices)
     allocator->mem_free(mesh->indices);
+  if (mesh->per_face_tex_id && mesh->indices_count)
+    allocator->mem_free(mesh->face_tex);
 }
 
 void
@@ -375,6 +352,7 @@ create_unit_capsule(
   assert(mesh != NULL);
   assert(half_height_to_radius_ratio > 0.f);
   assert(factor >= 1);
+  memset(mesh, 0, sizeof(mesh_t));
 
   mesh->materials.used = 0;
 

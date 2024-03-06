@@ -23,13 +23,6 @@ typedef struct mesh_t mesh_t;
 typedef struct allocator_t allocator_t;
 
 ENTITY_API
-void
-swap_mesh_internals(
-  mesh_t* to, 
-  mesh_t* from,
-  const allocator_t* allocator);
-
-ENTITY_API
 mesh_t* 
 allocate_mesh_array(
   uint32_t count, 
