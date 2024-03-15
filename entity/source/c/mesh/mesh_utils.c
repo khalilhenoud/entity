@@ -63,8 +63,6 @@ free_mesh_internal(
     allocator->mem_free(mesh->uvs);
   if (mesh->indices)
     allocator->mem_free(mesh->indices);
-  if (mesh->per_face_tex_id && mesh->indices_count)
-    allocator->mem_free(mesh->face_tex);
 }
 
 void

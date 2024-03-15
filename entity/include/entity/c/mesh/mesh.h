@@ -28,8 +28,6 @@ struct mesh_t {
   uint32_t vertices_count;
   uint32_t* indices;
   uint32_t indices_count;
-  uint32_t per_face_tex_id;
-  uint32_t* face_tex;
   material_array_t materials;
 } mesh_t;
 
