@@ -60,7 +60,7 @@ get_view_transformation(
   assert(camera);
   assert(out && "out matrix cannot be null!");
 
-  matrix3f_set_identity(out);
+  matrix4f_set_identity(out);
 
   {
     matrix4f translation, cross_product, camera_rotation;
