@@ -332,12 +332,18 @@ create_bvh(
 void
 free_bvh(bvh_t* bvh, const allocator_t* allocator)
 {
-  assert(bvh && bvh->faces && allocator);
+  assert(bvh && allocator);
 
-  allocator->mem_free(bvh->faces);
-  allocator->mem_free(bvh->normals);
-  allocator->mem_free(bvh->bounds);
-  allocator->mem_free(bvh->nodes);
+  // we might have moved the pointers to avoid duplicates.
+  if (bvh->faces)
+    allocator->mem_free(bvh->faces);
+  if (bvh->normals)
+    allocator->mem_free(bvh->normals);
+  if (bvh->bounds)
+    allocator->mem_free(bvh->bounds);
+  if (bvh->nodes)
+    allocator->mem_free(bvh->nodes);
+
   allocator->mem_free(bvh);
 }
 
