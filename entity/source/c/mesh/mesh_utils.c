@@ -52,8 +52,7 @@ free_mesh_internal(
   mesh_t* mesh, 
   const allocator_t* allocator)
 {
-  assert(mesh != NULL);
-  assert(allocator);
+  assert(mesh && allocator);
 
   if (mesh->vertices)
     allocator->mem_free(mesh->vertices);

@@ -22,6 +22,8 @@
 #include <entity/c/mesh/texture_utils.h>
 #include <entity/c/misc/font.h>
 #include <entity/c/misc/font_utils.h>
+#include <entity/c/spatial/bvh.h>
+#include <entity/c/spatial/bvh_utils.h>
 
 
 scene_t*
@@ -66,6 +68,9 @@ free_scene(scene_t* scene, const allocator_t* allocator)
   
   if (scene->camera_repo.count)
     allocator->mem_free(scene->camera_repo.cameras);
+
+  if (scene->bvh_repo.count)
+    free_bvh_array(scene->bvh_repo.bvhs, scene->bvh_repo.count, allocator);
 
   allocator->mem_free(scene);
 }
