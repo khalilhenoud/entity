@@ -23,13 +23,6 @@ typedef struct node_t node_t;
 typedef struct allocator_t allocator_t;
 
 ENTITY_API
-void
-swap_node_internals(
-  node_t* to, 
-  node_t* from, 
-  const allocator_t* allocator);
-
-ENTITY_API
 node_t*
 allocate_node_array(uint32_t count, const allocator_t* allocator);
 

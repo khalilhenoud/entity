@@ -16,7 +16,7 @@
 #define MAX_TEXTURE_COUNT_PER_MATERIAL          8
 
 
-typedef struct string_t string_t;
+typedef struct cstring_t cstring_t;
 
 // TODO: We need some utils to create arrays and the likes.
 typedef
@@ -35,7 +35,7 @@ struct texture_properties_array_t {
 
 typedef
 struct material_t {
-  string_t* name;
+  cstring_t* name;
   color_rgba_t ambient;
   color_rgba_t diffuse;
   color_rgba_t specular;

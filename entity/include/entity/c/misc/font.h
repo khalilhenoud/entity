@@ -12,12 +12,12 @@
 #define MISC_FONT_H
 
 
-typedef struct string_t string_t;
+typedef struct cstring_t cstring_t;
 
 typedef
 struct font_t {
-  string_t* image_file;
-  string_t* data_file;
+  cstring_t *image_file;
+  cstring_t *data_file;
 } font_t;
 
 #endif

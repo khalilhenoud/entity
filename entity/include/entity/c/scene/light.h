@@ -15,7 +15,7 @@
 #include <entity/c/mesh/color.h>
 
 
-typedef struct string_t string_t;
+typedef struct cstring_t cstring_t;
 
 typedef
 enum light_type_t {
@@ -32,7 +32,7 @@ enum light_type_t {
 // final_attenuation = 1/(constant_att + linear_att * d + quad_att * d*d).
 typedef
 struct light_t {
-  string_t* name;
+  cstring_t* name;
   vector3f position;
   vector3f direction;
   vector3f up;

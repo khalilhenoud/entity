@@ -11,7 +11,7 @@
 #include <assert.h>
 #include <string.h>
 #include <library/allocator/allocator.h>
-#include <library/string/string.h>
+#include <library/string/cstring.h>
 #include <entity/c/mesh/texture.h>
 #include <entity/c/mesh/texture_utils.h>
 
@@ -54,7 +54,8 @@ free_texture_internal(
 {
   assert(texture && allocator);
 
-  free_string(texture->path);
+  cstring_cleanup(texture->path, NULL);
+  allocator->mem_free(texture->path);
 }
 
 void

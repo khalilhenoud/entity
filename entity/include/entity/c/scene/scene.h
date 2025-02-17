@@ -15,7 +15,7 @@
 #include <math/c/matrix4f.h>
 
 
-typedef struct string_t string_t;
+typedef struct cstring_t cstring_t;
 typedef struct mesh_t mesh_t;
 typedef struct material_t material_t;
 typedef struct texture_t texture_t;
@@ -84,7 +84,7 @@ struct scene_metadata_t {
 // should support here.
 typedef
 struct scene_t {
-  string_t* name;
+  cstring_t* name;
   scene_metadata_t metadata;
   node_repo_t node_repo;        // root is: node_repo.nodes[0];
   light_repo_t light_repo;

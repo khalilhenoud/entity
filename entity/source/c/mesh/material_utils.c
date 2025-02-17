@@ -11,7 +11,7 @@
 #include <assert.h>
 #include <string.h>
 #include <library/allocator/allocator.h>
-#include <library/string/string.h>
+#include <library/string/cstring.h>
 #include <entity/c/mesh/material.h>
 #include <entity/c/mesh/material_utils.h>
 
@@ -54,7 +54,8 @@ free_material_internal(
 {
   assert(material && allocator);
 
-  free_string(material->name);
+  cstring_cleanup(material->name, NULL);
+  allocator->mem_free(material->name);
 }
 
 void

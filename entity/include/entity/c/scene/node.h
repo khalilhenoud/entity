@@ -15,7 +15,7 @@
 #include <math/c/matrix4f.h>
 
 
-typedef struct string_t string_t;
+typedef struct cstring_t cstring_t;
 
 // Indicies into the scene payloads.
 typedef
@@ -26,7 +26,7 @@ struct payload_indices_t {
 
 typedef
 struct node_t {
-  string_t* name;
+  cstring_t *name;
   matrix4f transform;
   payload_indices_t meshes;
   payload_indices_t nodes;

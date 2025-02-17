@@ -12,12 +12,12 @@
 #define SCENE_TEXTURE_H
 
 
-typedef struct string_t string_t;
+typedef struct cstring_t cstring_t;
 
 // TODO: utils file?
 typedef 
 struct texture_t {
-  string_t* path;
+  cstring_t* path;
 } texture_t;
 
 #endif

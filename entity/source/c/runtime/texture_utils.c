@@ -11,7 +11,7 @@
 #include <assert.h>
 #include <string.h>
 #include <library/allocator/allocator.h>
-#include <library/string/string.h>
+#include <library/string/cstring.h>
 #include <entity/c/mesh/texture.h>
 #include <entity/c/runtime/texture.h>
 #include <entity/c/runtime/texture_utils.h>
@@ -28,7 +28,11 @@ create_texture_runtime(
     texture_runtime_t* runtime = 
       (texture_runtime_t*)allocator->mem_alloc(sizeof(texture_runtime_t));
     memset(runtime, 0, sizeof(texture_runtime_t));
-    runtime->texture.path = allocate_string(texture->path->str, allocator);
+    
+    runtime->texture.path = allocator->mem_alloc(sizeof(cstring_t));
+    cstring_def(runtime->texture.path);
+    cstring_setup(runtime->texture.path, texture->path->str, allocator);
+
     return runtime;
   }
 }
@@ -58,8 +62,10 @@ free_texture_runtime_internal(
     allocator->mem_free(runtime->buffer);
   }
 
-  if (runtime->texture.path)
-    free_string(runtime->texture.path);
+  if (runtime->texture.path) {
+    cstring_cleanup(runtime->texture.path, NULL);
+    allocator->mem_free(runtime->texture.path);
+  }
 }
 
 void

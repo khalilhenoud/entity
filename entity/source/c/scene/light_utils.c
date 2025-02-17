@@ -9,7 +9,7 @@
  * 
  */
 #include <assert.h>
-#include <library/string/string.h>
+#include <library/string/cstring.h>
 #include <library/allocator/allocator.h>
 #include <entity/c/scene/light.h>
 #include <entity/c/scene/light_utils.h>
@@ -37,8 +37,10 @@ free_light_internal(
 {
   assert(light && allocator);
 
-  if (light->name)
-    free_string(light->name);
+  if (light->name) {
+    cstring_cleanup(light->name, NULL);
+    allocator->mem_free(light->name);
+  }
 }
 
 void

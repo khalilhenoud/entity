@@ -10,7 +10,7 @@
  */
 #include <assert.h>
 #include <library/allocator/allocator.h>
-#include <library/string/string.h>
+#include <library/string/cstring.h>
 #include <entity/c/scene/scene.h>
 #include <entity/c/scene/scene_utils.h>
 #include <entity/c/scene/light_utils.h>
@@ -38,7 +38,9 @@ create_scene(
     assert(scene && "failed to allocate scene!");
     
     memset(scene, 0, sizeof(scene));
-    scene->name = allocate_string(name, allocator);
+    scene->name = allocator->mem_alloc(sizeof(cstring_t));
+    cstring_def(scene->name);
+    cstring_setup(scene->name, name, allocator);
 
     return scene;
   }
@@ -49,7 +51,9 @@ free_scene(scene_t* scene, const allocator_t* allocator)
 {
   assert(scene && allocator);
 
-  free_string(scene->name);
+  cstring_cleanup(scene->name, NULL);
+  allocator->mem_free(scene->name);
+  
   free_mesh_array(scene->mesh_repo.meshes, scene->mesh_repo.count, allocator);
   free_node_array(scene->node_repo.nodes, scene->node_repo.count, allocator);
   free_font_array(scene->font_repo.fonts, scene->font_repo.count, allocator);

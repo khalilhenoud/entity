@@ -11,7 +11,7 @@
 #include <assert.h>
 #include <string.h>
 #include <library/allocator/allocator.h>
-#include <library/string/string.h>
+#include <library/string/cstring.h>
 #include <entity/c/misc/font.h>
 #include <entity/c/misc/font_utils.h>
 
@@ -31,8 +31,15 @@ create_font(
   {
     font_t* font = (font_t*)allocator->mem_alloc(sizeof(font_t));
     memset(font, 0, sizeof(font_t));
-    font->image_file = allocate_string(image_file, allocator);
-    font->data_file = allocate_string(data_file, allocator);
+
+    font->image_file = allocator->mem_alloc(sizeof(cstring_t));
+    cstring_def(font->image_file);
+    cstring_setup(font->image_file, image_file, allocator);
+
+    font->data_file = allocator->mem_alloc(sizeof(cstring_t));
+    cstring_def(font->data_file);
+    cstring_setup(font->data_file, data_file, allocator);
+
     return font;
   }
 }
@@ -74,8 +81,12 @@ free_font_internal(
 {
   assert(allocator != NULL);
   assert(font != NULL && "font is NULL!");
-  free_string(font->image_file);
-  free_string(font->data_file);
+
+  cstring_cleanup(font->image_file, NULL);
+  allocator->mem_free(font->image_file);
+
+  cstring_cleanup(font->data_file, NULL);
+  allocator->mem_free(font->data_file);
 }
 
 void
