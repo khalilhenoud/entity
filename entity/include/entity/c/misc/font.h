@@ -11,6 +11,7 @@
 #ifndef MISC_FONT_H
 #define MISC_FONT_H
 
+#include <stdint.h>
 #include <entity/c/internal/module.h>
 
 
@@ -36,7 +37,7 @@
 //|    *_cleanup                | YES
 ////////////////////////////////////////////////////////////////////////////////
 // NOTE:
-//  - should font_t own the allocator.
+//  - should font_t own its allocator?
 ////////////////////////////////////////////////////////////////////////////////
 
 typedef struct allocator_t allocator_t;
