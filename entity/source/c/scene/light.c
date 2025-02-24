@@ -28,30 +28,6 @@ light_def(void *ptr)
   }
 }
 
-// note: mvsc will lose its mind otherwise
-inline
-static
-uint32_t
-vec3_equal(const vector3f left, const vector3f right)
-{
-  return 
-    left.data[0] == right.data[0] && 
-    left.data[1] == right.data[1] && 
-    left.data[2] == right.data[2];
-}
-
-inline
-static
-uint32_t
-crgba_equal(const color_rgba_t left, const color_rgba_t right)
-{
-  return 
-    left.data[0] == right.data[0] && 
-    left.data[1] == right.data[1] && 
-    left.data[2] == right.data[2] && 
-    left.data[3] == right.data[3];
-}
-
 uint32_t 
 light_is_def(const void *ptr)
 {
@@ -61,20 +37,7 @@ light_is_def(const void *ptr)
     const light_t *light = (const light_t *)ptr;
     light_t def; 
     light_def(&def);
-    return 
-      light->name == def.name && 
-      vec3_equal(light->position, def.position) &&
-      vec3_equal(light->direction, def.direction) &&
-      vec3_equal(light->up, def.up) &&
-      light->inner_cone == def.inner_cone &&
-      light->outer_cone == def.outer_cone &&
-      light->attenuation_constant == def.attenuation_constant &&
-      light->attenuation_linear == def.attenuation_linear &&
-      light->attenuation_quadratic == def.attenuation_quadratic &&
-      crgba_equal(light->diffuse, def.diffuse) &&
-      crgba_equal(light->specular, def.specular) &&
-      crgba_equal(light->ambient, def.ambient) &&
-      light->type == def.type;
+    return !memcmp(light, &def, sizeof(light_t));
   }
 }
 

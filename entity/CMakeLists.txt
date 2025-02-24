@@ -7,11 +7,13 @@ project(entity VERSION 1.0)
 #   font_utils.h/.c
 #   light_utils.h/.c
 #   texture_utils.h/.c
+#   material_utils.h/.c
 
 # add the executable
 add_library(${PROJECT_NAME} SHARED
         ./source/c/mesh/mesh_utils.c
         ./source/c/mesh/material_utils.c
+        ./source/c/mesh/material.c
         ./source/c/mesh/texture_utils.c
         ./source/c/mesh/texture.c
         ./source/c/misc/font_utils.c
