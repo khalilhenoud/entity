@@ -11,6 +11,10 @@
 #ifndef SCENE_TEXTURE_H
 #define SCENE_TEXTURE_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdint.h>
 #include <entity/c/internal/module.h>
 
@@ -95,5 +99,9 @@ texture_setup(
   texture_t *texture, 
   const char *path, 
   const allocator_t* allocator);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

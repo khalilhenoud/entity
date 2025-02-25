@@ -11,6 +11,10 @@
 #ifndef MISC_FONT_H
 #define MISC_FONT_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdint.h>
 #include <entity/c/internal/module.h>
 
@@ -98,5 +102,8 @@ font_setup(
   const char *data_file, 
   const allocator_t* allocator);
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif

@@ -11,6 +11,10 @@
 #ifndef SCENE_MATERIAL_H
 #define SCENE_MATERIAL_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdint.h>
 #include <entity/c/internal/module.h>
 #include <entity/c/mesh/color.h>
@@ -124,5 +128,9 @@ material_setup(
   float opacity,
   texture_properties_array_t textures,
   const allocator_t* allocator);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

@@ -11,6 +11,10 @@
 #ifndef SCENE_LIGHT_H
 #define SCENE_LIGHT_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdint.h>
 #include <entity/c/internal/module.h>
 #include <entity/c/mesh/color.h>
@@ -135,5 +139,9 @@ light_setup(
   color_rgba_t ambient,
   light_type_t type,
   const allocator_t *allocator);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
