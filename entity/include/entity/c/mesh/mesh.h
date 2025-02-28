@@ -119,21 +119,6 @@ mesh_setup(
   material_array_t materials,
   const allocator_t* allocator);
 
-ENTITY_API
-mesh_t*
-create_unit_cube(const allocator_t* allocator);
-
-ENTITY_API
-mesh_t*
-create_unit_sphere(const int32_t factor, const allocator_t* allocator);
-
-ENTITY_API
-mesh_t*
-create_unit_capsule(
-  const int32_t factor, 
-  const float half_height_to_radius_ratio,
-  const allocator_t* allocator);
-
 #ifdef __cplusplus
 }
 #endif

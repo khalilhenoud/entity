@@ -8,7 +8,8 @@ project(entity VERSION 1.0)
 #   light_utils.h/.c
 #   texture_utils.h/.c
 #   material_utils.h/.c
-#   mesh_utils.h/.c
+#   mesh_utils.h/.c; part of the files needs trimming.
+#   camera_utils.h/.c
 
 # add the executable
 add_library(${PROJECT_NAME} SHARED
