@@ -10,6 +10,7 @@ project(entity VERSION 1.0)
 #   material_utils.h/.c
 #   mesh_utils.h/.c; part of the files needs trimming.
 #   camera_utils.h/.c
+#   node_utils.h/.c
 
 # add the executable
 add_library(${PROJECT_NAME} SHARED
@@ -27,6 +28,7 @@ add_library(${PROJECT_NAME} SHARED
         ./source/c/scene/camera_utils.c
         ./source/c/scene/light_utils.c
         ./source/c/scene/light.c
+        ./source/c/scene/node.c
         ./source/c/scene/node_utils.c
         ./source/c/scene/scene_utils.c
         ./include/entity/c/internal/module.h
