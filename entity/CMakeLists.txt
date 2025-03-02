@@ -12,6 +12,7 @@ project(entity VERSION 1.0)
 #   camera_utils.h/.c
 #   node_utils.h/.c
 #   bvh_utils.h/.c
+#   scene_utils.h/.c
 
 # add the executable
 add_library(${PROJECT_NAME} SHARED
@@ -27,12 +28,14 @@ add_library(${PROJECT_NAME} SHARED
         ./source/c/runtime/texture_utils.c
         ./source/c/spatial/bvh_utils.c
         ./source/c/spatial/bvh.c
+        ./source/c/scene/camera.c
         ./source/c/scene/camera_utils.c
         ./source/c/scene/light_utils.c
         ./source/c/scene/light.c
         ./source/c/scene/node.c
         ./source/c/scene/node_utils.c
         ./source/c/scene/scene_utils.c
+        ./source/c/scene/scene.c
         ./include/entity/c/internal/module.h
         )
 
