@@ -11,6 +11,7 @@ project(entity VERSION 1.0)
 #   mesh_utils.h/.c; part of the files needs trimming.
 #   camera_utils.h/.c
 #   node_utils.h/.c
+#   bvh_utils.h/.c
 
 # add the executable
 add_library(${PROJECT_NAME} SHARED
@@ -25,6 +26,7 @@ add_library(${PROJECT_NAME} SHARED
         ./source/c/runtime/font_utils.c
         ./source/c/runtime/texture_utils.c
         ./source/c/spatial/bvh_utils.c
+        ./source/c/spatial/bvh.c
         ./source/c/scene/camera_utils.c
         ./source/c/scene/light_utils.c
         ./source/c/scene/light.c

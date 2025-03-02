@@ -17,17 +17,10 @@ extern "C" {
 
 #include <stdint.h>
 #include <entity/c/internal/module.h>
+#include <entity/c/spatial/bvh.h>
 
 
-typedef struct bvh_t bvh_t;
-typedef struct bvh_aabb_t bvh_aabb_t;
 typedef struct allocator_t allocator_t;
-
-typedef
-enum bvh_construction_method_t {
-  BVH_CONSTRUCT_NAIVE,
-  BVH_CONSTRUCT_COUNT
-} bvh_construction_method_t;
 
 // NOTE: we use multidimensional arrays, to take into account multiple meshes 
 // contributing to the bvh.
@@ -65,45 +58,6 @@ void
 free_bvh(
   bvh_t* bvh, 
   const allocator_t *allocator);
-
-////////////////////////////////////////////////////////////////////////////////
-
-inline
-uint32_t
-get_max_node_count(uint32_t count)
-{
-  return 2 * (count + 1) - 1; 
-}
-
-ENTITY_API
-void
-merge_aabb(
-  bvh_aabb_t* dst, 
-  const bvh_aabb_t* a, 
-  const bvh_aabb_t* b);
-
-ENTITY_API
-void
-merge_aabb_inplace(
-  bvh_aabb_t* dst, 
-  const bvh_aabb_t* b);
-
-ENTITY_API
-uint32_t
-get_bvh_primitives_per_leaf(void);
-
-ENTITY_API
-int32_t
-bounds_intersect(const bvh_aabb_t* left, const bvh_aabb_t* right);
-
-// NOTE: A max 256 leaf indices returned, if used is 0 no intersection.
-ENTITY_API
-void
-query_intersection_fixed_256(
-  bvh_t* bvh, 
-  bvh_aabb_t* bound, 
-  uint32_t array[256], 
-  uint32_t* used);
 
 #ifdef __cplusplus
 }
