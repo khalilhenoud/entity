@@ -13,6 +13,7 @@
 #include <library/core/core.h>
 #include <library/type_registry/type_registry.h>
 #include <library/allocator/allocator.h>
+#include <library/streams/binary_stream.h>
 #include <math/c/common.h>
 #include <math/c/matrix4f.h>
 #include <entity/c/mesh/mesh.h>
@@ -51,17 +52,21 @@ mesh_serialize(
 
   {
     const mesh_t *mesh = (const mesh_t *)src;
-    size_t vtotal = sizeof(float) * 3 * mesh->vertices_count;
-    size_t itotal = sizeof(uint32_t) * mesh->indices_count;
-    size_t mtotal = sizeof(uint32_t) * MAX_MATERIAL_NUMBER;
+    size_t vtx_total = sizeof(float) * 3 * mesh->vertices_count;
+    size_t idx_total = sizeof(uint32_t) * mesh->indices_count;
+    size_t mtx_total = sizeof(uint32_t) * MAX_MATERIAL_NUMBER;
     binary_stream_write(stream, &mesh->vertices_count, sizeof(uint32_t));
     binary_stream_write(stream, &mesh->indices_count, sizeof(uint32_t));
     binary_stream_write(stream, &mesh->materials.used, sizeof(uint32_t));
-    binary_stream_write(stream, &mesh->materials.indices, mtotal);
-    binary_stream_write(stream, &mesh->vertices, vtotal);
-    binary_stream_write(stream, &mesh->normals, vtotal);
-    binary_stream_write(stream, &mesh->uvs, vtotal);
-    binary_stream_write(stream, &mesh->indices, itotal);
+    if (vtx_total) {
+      binary_stream_write(stream, mesh->vertices, vtx_total);
+      binary_stream_write(stream, mesh->normals, vtx_total);
+      binary_stream_write(stream, mesh->uvs, vtx_total);
+    }
+    if (idx_total)
+      binary_stream_write(stream, mesh->indices, idx_total);
+    if (mtx_total)
+      binary_stream_write(stream, mesh->materials.indices, mtx_total);
   }
 }
 
@@ -74,7 +79,7 @@ mesh_deserialize(
   assert(dst && allocator && stream);
 
   {
-    size_t mtotal = sizeof(uint32_t) * MAX_MATERIAL_NUMBER;
+    size_t mtx_total = sizeof(uint32_t) * MAX_MATERIAL_NUMBER;
     mesh_t *mesh = (mesh_t *)dst;
     binary_stream_read(
       stream, (uint8_t *)&mesh->vertices_count, 
@@ -85,21 +90,35 @@ mesh_deserialize(
     binary_stream_read(
       stream, (uint8_t *)&mesh->materials.used, 
       sizeof(uint32_t), sizeof(uint32_t));
-    binary_stream_read(
-      stream, (uint8_t *)&mesh->materials.indices, 
-      mtotal, mtotal);
+    
     {
-      size_t vtotal = sizeof(float) * 3 * mesh->vertices_count;
-      size_t itotal = sizeof(uint32_t) * mesh->indices_count;
-      mesh->vertices = (float *)allocator->mem_alloc(vtotal);
-      mesh->normals = (float *)allocator->mem_alloc(vtotal);
-      mesh->uvs = (float *)allocator->mem_alloc(vtotal);
-      mesh->indices = (uint32_t *)allocator->mem_alloc(itotal);
-      binary_stream_read(stream, (uint8_t *)&mesh->vertices, vtotal, vtotal);
-      binary_stream_read(stream, (uint8_t *)&mesh->normals, vtotal, vtotal);
-      binary_stream_read(stream, (uint8_t *)&mesh->uvs, vtotal, vtotal);
-      binary_stream_read(stream, (uint8_t *)&mesh->indices, itotal, itotal);
+      size_t vtx_total = sizeof(float) * 3 * mesh->vertices_count;
+      size_t idx_total = sizeof(uint32_t) * mesh->indices_count;
+      mesh->vertices = NULL;
+      mesh->normals = NULL;
+      mesh->uvs = NULL;
+      mesh->indices = NULL;
+      if (vtx_total) {
+        mesh->vertices = (float*)allocator->mem_alloc(vtx_total);
+        mesh->normals = (float*)allocator->mem_alloc(vtx_total);
+        mesh->uvs = (float*)allocator->mem_alloc(vtx_total);
+        binary_stream_read(
+          stream, (uint8_t*)mesh->vertices, vtx_total, vtx_total);
+        binary_stream_read(
+          stream, (uint8_t*)mesh->normals, vtx_total, vtx_total);
+        binary_stream_read(
+          stream, (uint8_t*)mesh->uvs, vtx_total, vtx_total);
+      }
+      if (idx_total) {
+        mesh->indices = (uint32_t*)allocator->mem_alloc(idx_total);
+        binary_stream_read(
+          stream, (uint8_t*)mesh->indices, idx_total, idx_total);
+      }
     }
+
+    binary_stream_read(
+      stream, (uint8_t *)mesh->materials.indices, 
+      mtx_total, mtx_total);
   }
 }
 
@@ -131,10 +150,13 @@ mesh_cleanup(
 
   {
     mesh_t *mesh = (mesh_t *)ptr;
-    allocator->mem_free(mesh->vertices);
-    allocator->mem_free(mesh->normals);
-    allocator->mem_free(mesh->uvs);
-    allocator->mem_free(mesh->indices);
+    if (mesh->vertices_count) {
+      allocator->mem_free(mesh->vertices);
+      allocator->mem_free(mesh->normals);
+      allocator->mem_free(mesh->uvs);
+    }
+    if (mesh->indices_count)
+      allocator->mem_free(mesh->indices);
     memset(mesh, 0, sizeof(mesh_t));
   }
 }

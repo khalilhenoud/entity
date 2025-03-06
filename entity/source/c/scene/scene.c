@@ -58,20 +58,6 @@ scene_is_def(const void *ptr)
   }
 }
 
-// typedef
-// struct scene_t {
-//   cstring_t *name;
-//   scene_metadata_t metadata;
-//   node_repo_t node_repo;        // root is: node_repo.nodes[0];
-//   light_repo_t light_repo;
-//   mesh_repo_t mesh_repo;
-//   material_repo_t material_repo;
-//   texture_repo_t texture_repo;
-//   font_repo_t font_repo;
-//   camera_repo_t camera_repo;
-//   bvh_repo_t bvh_repo;
-// } scene_t;
-
 void 
 scene_serialize(
   const void *src, 
@@ -130,9 +116,12 @@ scene_deserialize(
   {
     uint32_t i = 0;
     scene_t *scene = (scene_t *)dst;
-    scene->name = (cstring_t *)allocator->mem_alloc(sizeof(cstring_t));
-    cstring_def(scene->name);
+    cstring_cleanup(scene->name, NULL);
     cstring_deserialize(scene->name, allocator, stream);
+
+    binary_stream_read(
+      stream, (uint8_t *)&scene->metadata, 
+      sizeof(scene_metadata_t), sizeof(scene_metadata_t));
 
     binary_stream_read(
       stream, (uint8_t *)&scene->node_repo.count, 
@@ -228,30 +217,39 @@ scene_cleanup(
   assert(allocator);
 
   {
+    uint32_t i = 0;
     scene_t *scene = (scene_t *)ptr;
     cstring_free(scene->name, allocator);
 
-    free_mesh_array(scene->mesh_repo.meshes, scene->mesh_repo.count, allocator);
-    free_node_array(scene->node_repo.nodes, scene->node_repo.count, allocator);
-    free_font_array(scene->font_repo.fonts, scene->font_repo.count, allocator);
+    for (i = 0; i < scene->mesh_repo.count; ++i)
+      mesh_cleanup(scene->mesh_repo.meshes + i, allocator);
+    allocator->mem_free(scene->mesh_repo.meshes);
 
-    if (scene->light_repo.count)
-      free_light_array(
-        scene->light_repo.lights, scene->light_repo.count, allocator);
+    for (i = 0; i < scene->node_repo.count; ++i)
+      node_cleanup(scene->node_repo.nodes + i, allocator);
+    allocator->mem_free(scene->node_repo.nodes);
 
-    if (scene->material_repo.count)
-      free_material_array(
-        scene->material_repo.materials, scene->material_repo.count, allocator);
-    
-    if (scene->texture_repo.count)
-      free_texture_array(
-        scene->texture_repo.textures, scene->texture_repo.count, allocator);
-    
-    if (scene->camera_repo.count)
-      allocator->mem_free(scene->camera_repo.cameras);
+    for (i = 0; i < scene->font_repo.count; ++i)
+      font_cleanup(scene->font_repo.fonts + i, allocator);
+    allocator->mem_free(scene->font_repo.fonts);
 
-    if (scene->bvh_repo.count)
-      free_bvh_array(scene->bvh_repo.bvhs, scene->bvh_repo.count, allocator);
+    for (i = 0; i < scene->light_repo.count; ++i)
+      light_cleanup(scene->light_repo.lights + i, allocator);
+    allocator->mem_free(scene->light_repo.lights);
+
+    for (i = 0; i < scene->material_repo.count; ++i)
+      material_cleanup(scene->material_repo.materials + i, allocator);
+    allocator->mem_free(scene->material_repo.materials);
+
+    for (i = 0; i < scene->texture_repo.count; ++i)
+      texture_cleanup(scene->texture_repo.textures + i, allocator);
+    allocator->mem_free(scene->texture_repo.textures);
+
+    allocator->mem_free(scene->camera_repo.cameras);
+
+    for (i = 0; i < scene->bvh_repo.count; ++i)
+      bvh_cleanup(scene->bvh_repo.bvhs + i, allocator);
+    allocator->mem_free(scene->bvh_repo.bvhs);
   }
 }
 
@@ -264,7 +262,6 @@ scene_setup(
 {
   assert(allocator);
   assert(scene && scene_is_def(scene));
-  assert(name);
 
   scene->name = cstring_create(name, allocator);
 }
@@ -274,7 +271,7 @@ scene_create(
   const char *name, 
   const allocator_t *allocator)
 {
-  assert(name && allocator);
+  assert(allocator);
 
   {
     scene_t *scene = (scene_t *)allocator->mem_alloc(sizeof(scene_t));

@@ -86,12 +86,6 @@ ENTITY_API
 const allocator_t *
 camera_get_alloc(const void *ptr);
 
-ENTITY_API
-void 
-camera_cleanup(
-  void *ptr, 
-  const allocator_t* allocator);
-
 ////////////////////////////////////////////////////////////////////////////////
 ENTITY_API
 void

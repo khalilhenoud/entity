@@ -54,13 +54,12 @@ free_mesh_internal(
 {
   assert(mesh && allocator);
 
-  if (mesh->vertices)
+  if (mesh->vertices_count) {
     allocator->mem_free(mesh->vertices);
-  if (mesh->normals)
     allocator->mem_free(mesh->normals);
-  if (mesh->uvs)
     allocator->mem_free(mesh->uvs);
-  if (mesh->indices)
+  }
+  if (mesh->indices_count)
     allocator->mem_free(mesh->indices);
 }
 
