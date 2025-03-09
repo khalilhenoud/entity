@@ -1,5 +1,5 @@
 /**
- * @file image_utils.h
+ * @file texture_utils.h
  * @author khalilhenoud@gmail.com
  * @brief 
  * @version 0.1

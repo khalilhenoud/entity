@@ -17,21 +17,14 @@
 #include <library/streams/binary_stream.h>
 #include <entity/c/scene/scene.h>
 #include <entity/c/scene/camera.h>
-#include <entity/c/scene/camera_utils.h>
 #include <entity/c/scene/light.h>
-#include <entity/c/scene/light_utils.h>
 #include <entity/c/scene/node.h>
-#include <entity/c/scene/node_utils.h>
 #include <entity/c/mesh/mesh.h>
 #include <entity/c/mesh/mesh_utils.h>
 #include <entity/c/mesh/material.h>
-#include <entity/c/mesh/material_utils.h>
 #include <entity/c/mesh/texture.h>
-#include <entity/c/mesh/texture_utils.h>
 #include <entity/c/misc/font.h>
-#include <entity/c/misc/font_utils.h>
 #include <entity/c/spatial/bvh.h>
-#include <entity/c/spatial/bvh_utils.h>
 
 
 void

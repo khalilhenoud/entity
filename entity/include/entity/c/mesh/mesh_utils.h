@@ -23,32 +23,6 @@ typedef struct mesh_t mesh_t;
 typedef struct allocator_t allocator_t;
 
 ENTITY_API
-mesh_t* 
-allocate_mesh_array(
-  uint32_t count, 
-  const allocator_t* allocator);
-
-ENTITY_API
-void
-free_mesh_array(
-  mesh_t* mesh, 
-  uint32_t count,
-  const allocator_t* allocator);
-
-ENTITY_API
-void
-free_mesh_internal(
-  mesh_t* mesh, 
-  const allocator_t* allocator);
-
-ENTITY_API
-void
-free_mesh(
-  mesh_t* mesh, 
-  const allocator_t *allocator);
-
-////////////////////////////////////////////////////////////////////////////////
-ENTITY_API
 mesh_t*
 create_unit_cube(const allocator_t* allocator);
 

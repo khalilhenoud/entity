@@ -100,7 +100,20 @@ font_setup(
   font_t *font, 
   const char *image_file, 
   const char *data_file, 
-  const allocator_t* allocator);
+  const allocator_t *allocator);
+
+ENTITY_API
+font_t*
+font_create(
+  const char *image_file, 
+  const char *data_file, 
+  const allocator_t *allocator);
+
+ENTITY_API
+void
+font_free(
+  font_t *font, 
+  const allocator_t *allocator);
 
 #ifdef __cplusplus
 }

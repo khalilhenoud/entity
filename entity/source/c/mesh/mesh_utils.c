@@ -17,62 +17,6 @@
 #include <entity/c/mesh/mesh_utils.h>
 
 
-mesh_t* 
-allocate_mesh_array(
-  uint32_t count, 
-  const allocator_t* allocator)
-{
-  assert(count && "Passed count is 0!");
-  assert(allocator);
-
-  {
-    mesh_t* ptr = (mesh_t*)allocator->mem_cont_alloc(count, sizeof(mesh_t));
-    assert(ptr && "Failed to allocate!");
-    return ptr;
-  }
-}
-
-void
-free_mesh_array(
-  mesh_t* mesh, 
-  uint32_t count, 
-  const allocator_t* allocator)
-{
-  assert(count && "Passed count is 0!");
-  assert(allocator);
-
-  for (uint32_t i = 0; i < count; ++i)
-    free_mesh_internal(mesh + i, allocator);
-
-  allocator->mem_free(mesh);
-}
-
-void
-free_mesh_internal(
-  mesh_t* mesh, 
-  const allocator_t* allocator)
-{
-  assert(mesh && allocator);
-
-  if (mesh->vertices_count) {
-    allocator->mem_free(mesh->vertices);
-    allocator->mem_free(mesh->normals);
-    allocator->mem_free(mesh->uvs);
-  }
-  if (mesh->indices_count)
-    allocator->mem_free(mesh->indices);
-}
-
-void
-free_mesh(
-  mesh_t* mesh, 
-  const allocator_t *allocator)
-{
-  free_mesh_internal(mesh, allocator);
-  allocator->mem_free(mesh);
-}
-
-////////////////////////////////////////////////////////////////////////////////
 static
 void
 create_unit_cube_face(

@@ -127,6 +127,35 @@ font_setup(
   font->data_file = cstring_create(data_file, allocator);
 }
 
+font_t*
+font_create(
+  const char *image_file, 
+  const char *data_file, 
+  const allocator_t *allocator)
+{
+  assert(allocator);
+  assert(
+    image_file && 
+    data_file && 
+    "image file or data file are NULL!");
+
+  {
+    font_t *font = (font_t *)allocator->mem_alloc(sizeof(font_t));
+    font_def(font);
+    font_setup(font, image_file, data_file, allocator);
+    return font;
+  }
+}
+
+void
+font_free(
+  font_t *font, 
+  const allocator_t *allocator)
+{
+  font_cleanup(font, allocator);
+  allocator->mem_free(font);
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 INITIALIZER(register_font_t)
 {
