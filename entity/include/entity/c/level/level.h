@@ -18,7 +18,9 @@ extern "C" {
 #include <stdint.h>
 
 
-typedef struct string_t string_t;
+// TODO: This should be revisited, it is not well defined and does not adhere to
+// anything in particular.
+
 typedef struct allocator_t allocator_t;
 
 typedef
@@ -47,7 +49,6 @@ uint32_t (*func_should_unload)(void);
 
 typedef
 struct level_t {
-  string_t* name;
   func_load load;
   func_update update;
   func_unload unload;
