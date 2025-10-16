@@ -17,6 +17,8 @@ extern "C" {
 
 #include <stdint.h>
 #include <entity/c/internal/module.h>
+#include <library/containers/cvector.h>
+#include <library/string/cstring.h>
 #include <math/c/vector3f.h>
 
 
@@ -46,65 +48,7 @@ extern "C" {
 ////////////////////////////////////////////////////////////////////////////////
 
 typedef struct allocator_t allocator_t;
-typedef struct cstring_t cstring_t;
 typedef struct binary_stream_t binary_stream_t;
-typedef struct mesh_t mesh_t;
-typedef struct material_t material_t;
-typedef struct texture_t texture_t;
-typedef struct node_t node_t;
-typedef struct font_t font_t;
-typedef struct camera_t camera_t;
-typedef struct light_t light_t;
-typedef struct bvh_t bvh_t;
-
-// TODO: These would be replace with a templated dynamic array (in C).
-typedef
-struct mesh_repo_t {
-  uint32_t count;
-  mesh_t *meshes;
-} mesh_repo_t;
-
-typedef
-struct light_repo_t {
-  uint32_t count;
-  light_t *lights;
-} light_repo_t;
-
-typedef
-struct texture_repo_t {
-  uint32_t count;
-  texture_t *textures;
-} texture_repo_t;
-
-typedef
-struct material_repo_t {
-  uint32_t count;
-  material_t *materials;
-} material_repo_t;
-
-typedef
-struct font_repo_t {
-  uint32_t count;
-  font_t *fonts;
-} font_repo_t;
-
-typedef
-struct camera_repo_t {
-  uint32_t count;
-  camera_t *cameras;
-} camera_repo_t;
-
-typedef
-struct node_repo_t {
-  uint32_t count;
-  node_t *nodes;
-} node_repo_t;
-
-typedef
-struct bvh_repo_t {
-  uint32_t count;
-  bvh_t *bvhs;
-} bvh_repo_t;
 
 typedef
 struct scene_metadata_t {
@@ -116,16 +60,16 @@ struct scene_metadata_t {
 // should support here.
 typedef
 struct scene_t {
-  cstring_t *name;
+  cstring_t name;
   scene_metadata_t metadata;
-  node_repo_t node_repo;        // root is: node_repo.nodes[0];
-  light_repo_t light_repo;
-  mesh_repo_t mesh_repo;
-  material_repo_t material_repo;
-  texture_repo_t texture_repo;
-  font_repo_t font_repo;
-  camera_repo_t camera_repo;
-  bvh_repo_t bvh_repo;
+  cvector_t node_repo;        // root is: node_repo.nodes[0];
+  cvector_t light_repo;
+  cvector_t mesh_repo;
+  cvector_t material_repo;
+  cvector_t texture_repo;
+  cvector_t font_repo;
+  cvector_t camera_repo;
+  cvector_t bvh_repo;
 } scene_t;
 
 ENTITY_API
@@ -147,7 +91,7 @@ void
 scene_deserialize(
   void *dst, 
   const allocator_t *allocator, 
-  binary_stream_t* stream);
+  binary_stream_t *stream);
 
 ENTITY_API
 size_t 
