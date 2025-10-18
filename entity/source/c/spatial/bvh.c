@@ -55,16 +55,10 @@ bvh_serialize(
   {
     uint32_t i = 0;
     const bvh_t *bvh = (const bvh_t *)src;
-    binary_stream_write(stream, &bvh->count, sizeof(uint32_t));
-    for (i = 0; i < bvh->count; ++i)
-      binary_stream_write(stream, bvh->normals + i, sizeof(vector3f));
-    for (i = 0; i < bvh->count; ++i)
-      binary_stream_write(stream, bvh->faces + i, sizeof(face_t));
-    for (i = 0; i < bvh->count; ++i)
-      binary_stream_write(stream, bvh->bounds + i, sizeof(bvh_aabb_t));
-    binary_stream_write(stream, &bvh->nodes_used, sizeof(uint32_t));
-    for (i = 0; i < bvh->nodes_used; ++i)
-      binary_stream_write(stream, bvh->nodes + i, sizeof(bvh_node_t));
+    cvector_serialize(&bvh->normals, stream);
+    cvector_serialize(&bvh->faces, stream);
+    cvector_serialize(&bvh->bounds, stream);
+    cvector_serialize(&bvh->nodes, stream);
   }
 }
 
@@ -79,36 +73,10 @@ bvh_deserialize(
   {
     uint32_t i = 0;
     bvh_t *bvh = (bvh_t *)dst;
-    binary_stream_read(
-      stream, (uint8_t *)&bvh->count, sizeof(uint32_t), sizeof(uint32_t));
-    bvh->normals = (vector3f *)allocator->mem_alloc(
-      bvh->count * sizeof(vector3f));
-    bvh->faces = (face_t *)allocator->mem_alloc(
-      bvh->count * sizeof(face_t));
-    bvh->bounds = (bvh_aabb_t *)allocator->mem_alloc(
-      bvh->count * sizeof(bvh_aabb_t));
-
-    for (i = 0; i < bvh->count; ++i)
-      binary_stream_read(
-        stream, (uint8_t *)&bvh->normals[i], 
-        sizeof(vector3f), sizeof(vector3f));
-    for (i = 0; i < bvh->count; ++i)
-      binary_stream_read(
-        stream, (uint8_t *)&bvh->faces[i], 
-        sizeof(face_t), sizeof(face_t));
-    for (i = 0; i < bvh->count; ++i)
-      binary_stream_read(
-        stream, (uint8_t *)&bvh->bounds[i], 
-        sizeof(bvh_aabb_t), sizeof(bvh_aabb_t));
-
-    binary_stream_read(
-      stream, (uint8_t *)&bvh->nodes_used, sizeof(uint32_t), sizeof(uint32_t));
-    bvh->nodes = (bvh_node_t *)allocator->mem_alloc(
-      bvh->nodes_used * sizeof(bvh_node_t));
-    for (i = 0; i < bvh->nodes_used; ++i)
-      binary_stream_read(
-        stream, (uint8_t *)&bvh->nodes[i], 
-        sizeof(bvh_node_t), sizeof(bvh_node_t));
+    cvector_deserialize(&bvh->normals, allocator, stream);
+    cvector_deserialize(&bvh->faces, allocator, stream);
+    cvector_deserialize(&bvh->bounds, allocator, stream);
+    cvector_deserialize(&bvh->nodes, allocator, stream);
   }
 }
 
@@ -140,69 +108,61 @@ bvh_cleanup(
 
   {
     bvh_t *bvh = (bvh_t *)ptr;
-    if (bvh->count) {
-      assert(bvh->faces);
-      assert(bvh->normals);
-      assert(bvh->bounds);
-      allocator->mem_free(bvh->faces);
-      allocator->mem_free(bvh->normals);
-      allocator->mem_free(bvh->bounds);
-    }
-   
-    if (bvh->nodes_used) {
-      assert(bvh->nodes);
-      allocator->mem_free(bvh->nodes);
-    }
+    cvector_cleanup2(&bvh->normals);
+    cvector_cleanup2(&bvh->faces);
+    cvector_cleanup2(&bvh->bounds);
+    cvector_cleanup2(&bvh->nodes);
   }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void
-get_aabb(point3f points[3], bvh_aabb_t* aabb);
+get_aabb(point3f points[3], bvh_aabb_t *aabb);
 
 void
-get_centroid(bvh_aabb_t* aabb, point3f* centroid);
+get_centroid(bvh_aabb_t *aabb, point3f *centroid);
 
 void
-swap_faces(bvh_t* bvh, uint32_t left, uint32_t right);
+swap_faces(bvh_t *bvh, uint32_t left, uint32_t right);
 
 void
 get_subdivision_plane_naive(
-  bvh_t* bvh,
-  bvh_node_t* node, 
+  bvh_t *bvh,
+  bvh_node_t *node, 
   uint32_t first_prim,
   uint32_t last_prim_excl,
-  point3f* center,
-  uint32_t* axis);
+  point3f *center,
+  uint32_t *axis);
   
 void
 subdivide_naive(
-  bvh_t* bvh, 
+  bvh_t *bvh, 
   uint32_t first_prim, 
   uint32_t last_prim_excl, 
-  uint32_t index);
+  uint32_t index,
+  uint32_t *nodes_used);
   
 void
-construct_bvh_naive(bvh_t* bvh, const allocator_t* allocator);
+construct_bvh_naive(bvh_t *bvh, const allocator_t *allocator);
 
 int32_t
-is_leaf(const bvh_node_t* node);
+is_leaf(const bvh_node_t *node);
 
 void
 query_intersection_fixed_256_internal(
-  bvh_t* bvh, 
+  bvh_t *bvh, 
   uint32_t node_index,
-  bvh_aabb_t* bounds, 
+  bvh_aabb_t *bounds, 
   uint32_t array[256], 
-  uint32_t* used);
+  uint32_t *used);
 
 bvh_t*
 bvh_create(
-  float** vertices, 
-  uint32_t** indices, 
-  uint32_t* indices_count, 
+  float **vertices, 
+  uint32_t **indices, 
+  uint32_t *indices_count, 
   uint32_t multi_count,
-  const allocator_t* allocator,
+  const allocator_t *allocator,
   bvh_construction_method_t method)
 {
   assert(vertices && indices && indices_count && multi_count && allocator);
@@ -213,23 +173,26 @@ bvh_create(
     assert(vertices[i] && indices[i] && indices_count[i]);
 
   {
-    bvh_t* bvh = allocator->mem_alloc(sizeof(bvh_t));
-    assert(bvh);
-    memset(bvh, 0, sizeof(bvh_t));
+    uint32_t to_allocate = 0;
+    bvh_t *bvh = allocator->mem_alloc(sizeof(bvh_t));
+    bvh_def(bvh);
 
     // find the total number of faces to be added.
     for (uint32_t i = 0; i < multi_count; ++i)
-      bvh->count += indices_count[i]/3;
+      to_allocate += indices_count[i]/3;
 
-    bvh->faces = allocator->mem_alloc(bvh->count * sizeof(face_t));
-    bvh->normals = allocator->mem_alloc(bvh->count * sizeof(vector3f));
-    bvh->bounds = allocator->mem_alloc(bvh->count * sizeof(bvh_aabb_t));
+    cvector_setup(&bvh->faces, get_type_data(face_t), 0, allocator);
+    cvector_resize(&bvh->faces, to_allocate);
+    cvector_setup(&bvh->normals, get_type_data(vector3f), 0, allocator);
+    cvector_resize(&bvh->normals, to_allocate);
+    cvector_setup(&bvh->bounds, get_type_data(bvh_aabb_t), 0, allocator);
+    cvector_resize(&bvh->bounds, to_allocate);
 
     {
       uint32_t iarray[3], count;
-      face_t* face;
-      vector3f* normal;
-      bvh_aabb_t* aabb;
+      face_t *face;
+      vector3f *normal;
+      bvh_aabb_t *aabb;
       uint32_t face_index = 0;
       for (uint32_t mesh_index = 0; mesh_index < multi_count; ++mesh_index) {
         count = indices_count[mesh_index];
@@ -239,9 +202,9 @@ bvh_create(
           iarray[1] = indices[mesh_index][i + 1];
           iarray[2] = indices[mesh_index][i + 2];
 
-          face = bvh->faces + face_index;
-          normal = bvh->normals + face_index;
-          aabb = bvh->bounds + face_index;
+          face = cvector_as(&bvh->faces, face_index, face_t);
+          normal = cvector_as(&bvh->normals, face_index, vector3f);
+          aabb = cvector_as(&bvh->bounds, face_index, bvh_aabb_t);
 
           // set the face vertices.
           for (uint32_t k = 0; k < 3; ++k) {
@@ -272,9 +235,12 @@ bvh_create(
               equal_to_v3f(face->points + 0, face->points + 1) ||
               equal_to_v3f(face->points + 0, face->points + 2) ||
               equal_to_v3f(face->points + 1, face->points + 2));
+            
             if (!is_valid) {
-              swap_faces(bvh, face_index, bvh->count - 1);
-              --bvh->count;
+              swap_faces(bvh, face_index, bvh->faces.size - 1);
+              cvector_pop_back(&bvh->faces);
+              cvector_pop_back(&bvh->normals);
+              cvector_pop_back(&bvh->bounds);
               continue;
             }
           }
@@ -285,9 +251,9 @@ bvh_create(
     }
 
     {
-      uint32_t nodes_count = get_max_node_count(bvh->count);
-      bvh->nodes = allocator->mem_alloc(nodes_count * sizeof(bvh_node_t));
-      memset(bvh->nodes, 0, sizeof(bvh_node_t) * nodes_count);
+      uint32_t nodes_count = get_max_node_count(bvh->faces.size);
+      cvector_setup(&bvh->nodes, get_type_data(bvh_node_t), 0, allocator);
+      cvector_resize(&bvh->nodes, nodes_count);
     }
 
     if (method == BVH_CONSTRUCT_NAIVE)
@@ -307,9 +273,9 @@ get_bvh_primitives_per_leaf(void)
 
 void
 merge_aabb(
-  bvh_aabb_t* dst, 
-  const bvh_aabb_t* a, 
-  const bvh_aabb_t* b)
+  bvh_aabb_t *dst, 
+  const bvh_aabb_t *a, 
+  const bvh_aabb_t *b)
 {
   dst->min_max[0].data[0] = fmin(a->min_max[0].data[0], b->min_max[0].data[0]);
   dst->min_max[0].data[1] = fmin(a->min_max[0].data[1], b->min_max[0].data[1]);
@@ -322,8 +288,8 @@ merge_aabb(
 
 void
 merge_aabb_inplace(
-  bvh_aabb_t* dst, 
-  const bvh_aabb_t* b)
+  bvh_aabb_t *dst, 
+  const bvh_aabb_t *b)
 {
   bvh_aabb_t a = *dst;
   dst->min_max[0].data[0] = fmin(a.min_max[0].data[0], b->min_max[0].data[0]);
@@ -337,7 +303,7 @@ merge_aabb_inplace(
 
 static
 void
-get_aabb(point3f points[3], bvh_aabb_t* aabb)
+get_aabb(point3f points[3], bvh_aabb_t *aabb)
 {
   point3f* min = aabb->min_max + 0;
   point3f* max = aabb->min_max + 1;
@@ -357,7 +323,7 @@ get_aabb(point3f points[3], bvh_aabb_t* aabb)
 
 static
 void
-get_centroid(bvh_aabb_t* aabb, point3f* centroid)
+get_centroid(bvh_aabb_t *aabb, point3f *centroid)
 {
   vector3f diff = diff_v3f(aabb->min_max + 0, aabb->min_max + 1);
   mult_set_v3f(&diff, 0.5f);
@@ -366,40 +332,43 @@ get_centroid(bvh_aabb_t* aabb, point3f* centroid)
 
 static
 void
-swap_faces(bvh_t* bvh, uint32_t left, uint32_t right)
+swap_faces(bvh_t *bvh, uint32_t left, uint32_t right)
 {
   assert(bvh);
-  assert(left < bvh->count && right < bvh->count);
+  assert(left < bvh->faces.size && right < bvh->faces.size);
 
   // swap the faces, the normals, and the bounds.
   {
-    face_t copy = bvh->faces[left];
-    bvh->faces[left] = bvh->faces[right];
-    bvh->faces[right] = copy;
+    face_t copy = *cvector_as(&bvh->faces, left, face_t);
+    *cvector_as(&bvh->faces, left, face_t) = *cvector_as(
+      &bvh->faces, right, face_t);
+    *cvector_as(&bvh->faces, right, face_t) = copy;
   }
 
   {
-    vector3f normal = bvh->normals[left];
-    bvh->normals[left] = bvh->normals[right];
-    bvh->normals[right] = normal;
+    vector3f normal = *cvector_as(&bvh->normals, left, vector3f);
+    *cvector_as(&bvh->normals, left, vector3f) = *cvector_as(
+      &bvh->normals, right, vector3f);
+    *cvector_as(&bvh->normals, right, vector3f) = normal;
   }
 
   {
-    bvh_aabb_t bounds = bvh->bounds[left];
-    bvh->bounds[left] = bvh->bounds[right];
-    bvh->bounds[right] = bounds;
+    bvh_aabb_t bound = *cvector_as(&bvh->bounds, left, bvh_aabb_t);
+    *cvector_as(&bvh->bounds, left, bvh_aabb_t) = *cvector_as(
+      &bvh->bounds, right, bvh_aabb_t);
+    *cvector_as(&bvh->bounds, right, bvh_aabb_t) = bound;
   }
 }
 
 static
 void
 get_subdivision_plane_naive(
-  bvh_t* bvh,
-  bvh_node_t* node, 
+  bvh_t *bvh,
+  bvh_node_t *node, 
   uint32_t first_prim,
   uint32_t last_prim_excl,
-  point3f* center, 
-  uint32_t* axis)
+  point3f *center, 
+  uint32_t *axis)
 {
   int32_t left[] = { 0, 0, 0 }, right[] = { 0, 0, 0 };
   int32_t quota = INT32_MAX;
@@ -407,7 +376,7 @@ get_subdivision_plane_naive(
   get_centroid(&node->bounds, center);
 
   for (uint32_t j = first_prim; j < last_prim_excl; ++j) {
-    get_centroid(&bvh->bounds[j], &face_centroid);
+    get_centroid(cvector_as(&bvh->bounds, j, bvh_aabb_t), &face_centroid);
 
     for (uint32_t candidate = 0; candidate < 3; ++candidate) {
       if (face_centroid.data[candidate] < center->data[candidate])
@@ -431,25 +400,27 @@ get_subdivision_plane_naive(
 static 
 void
 subdivide_naive(
-  bvh_t* bvh, 
+  bvh_t *bvh, 
   uint32_t first_prim, 
   uint32_t last_prim_excl, 
-  uint32_t index)
+  uint32_t index,
+  uint32_t *nodes_used)
 {
   assert(bvh);
-  assert(bvh->nodes_used < get_max_node_count(bvh->count));
-  assert(index < get_max_node_count(bvh->count));
+  assert(*nodes_used < get_max_node_count(bvh->faces.size));
+  assert(index < get_max_node_count(bvh->faces.size));
 
   {
-    bvh_node_t* node = bvh->nodes + index;
+    bvh_node_t *node = cvector_as(&bvh->nodes, index, bvh_node_t);
     point3f center;
     uint32_t axis;
     uint32_t i_prims[3] = {0, 0, 0};
 
     // calculate the node aabb.
-    node->bounds = bvh->bounds[first_prim];
+    node->bounds = *cvector_as(&bvh->bounds, first_prim, bvh_aabb_t);
     for (uint32_t i = first_prim; i < last_prim_excl; ++i)
-      merge_aabb_inplace(&node->bounds, &bvh->bounds[i]);
+      merge_aabb_inplace(
+        &node->bounds, cvector_as(&bvh->bounds, i, bvh_aabb_t));
 
     // stop the recursion if we have reached our goal.
     if ((last_prim_excl - first_prim) <= get_bvh_primitives_per_leaf()) {
@@ -468,7 +439,7 @@ subdivide_naive(
       point3f centroid;
 
       while (i < j) {
-        get_centroid(bvh->bounds + i, &centroid);
+        get_centroid(cvector_as(&bvh->bounds, i, bvh_aabb_t), &centroid);
         if (centroid.data[axis] < center.data[axis])
           ++i;
         else
@@ -485,29 +456,30 @@ subdivide_naive(
       
       // we are dealing with an interior node.
       node->tri_count = 0;
-      node->left_first = bvh->nodes_used;
-      bvh->nodes_used += 2;
+      node->left_first = *nodes_used;
+      *nodes_used += 2;
 
-      subdivide_naive(bvh, first_prim, i, node->left_first + 0);
-      subdivide_naive(bvh, i, last_prim_excl, node->left_first + 1);
+      subdivide_naive(bvh, first_prim, i, node->left_first + 0, nodes_used);
+      subdivide_naive(bvh, i, last_prim_excl, node->left_first + 1, nodes_used);
     }
   }
 }
 
 static
 void
-construct_bvh_naive(bvh_t* bvh, const allocator_t* allocator)
+construct_bvh_naive(bvh_t *bvh, const allocator_t *allocator)
 {
-  bvh_node_t* root = bvh->nodes;
-  root->left_first = root->tri_count = 0;
+  bvh_node_t *root = cvector_as(&bvh->nodes, 0, bvh_node_t);
   // this will allow us to skip the first node after the root, ensuring the left
   // and right nodes are on the same cacheline once aligned.
-  bvh->nodes_used += 2;
-  subdivide_naive(bvh, 0, bvh->count, 0);
+  uint32_t nodes_used = 0;
+  root->left_first = root->tri_count = 0;
+  subdivide_naive(bvh, 0, bvh->faces.size, 0, &nodes_used);
+  cvector_resize(&bvh->nodes, nodes_used);
 }
 
 int32_t
-bounds_intersect(const bvh_aabb_t* left, const bvh_aabb_t* right)
+bounds_intersect(const bvh_aabb_t *left, const bvh_aabb_t *right)
 {
   int32_t no_intersect_x = 
     left->min_max[0].data[0] > right->min_max[1].data[0] ||
@@ -523,7 +495,7 @@ bounds_intersect(const bvh_aabb_t* left, const bvh_aabb_t* right)
 
 static
 int32_t
-is_leaf(const bvh_node_t* node)
+is_leaf(const bvh_node_t *node)
 {
   return node->tri_count != 0;
 }
@@ -531,13 +503,13 @@ is_leaf(const bvh_node_t* node)
 static
 void
 query_intersection_fixed_256_internal(
-  bvh_t* bvh, 
+  bvh_t *bvh, 
   uint32_t node_index,
-  bvh_aabb_t* bounds, 
+  bvh_aabb_t *bounds, 
   uint32_t array[256], 
-  uint32_t* used)
+  uint32_t *used)
 {
-  bvh_node_t* node = bvh->nodes + node_index;
+  bvh_node_t* node = cvector_as(&bvh->nodes, node_index, bvh_node_t);
   if (is_leaf(node)) {
     if (bounds_intersect(&node->bounds, bounds))
       array[(*used)++] = node_index;
@@ -555,10 +527,10 @@ query_intersection_fixed_256_internal(
 
 void
 query_intersection_fixed_256(
-  bvh_t* bvh, 
-  bvh_aabb_t* bounds, 
+  bvh_t *bvh, 
+  bvh_aabb_t *bounds, 
   uint32_t array[256], 
-  uint32_t* used)
+  uint32_t *used)
 {
   assert(bvh && bounds && array && used);
   *used = 0;

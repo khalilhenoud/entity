@@ -17,6 +17,7 @@ extern "C" {
 
 #include <stdint.h>
 #include <entity/c/internal/module.h>
+#include <library/containers/cvector.h>
 #include <math/c/vector3f.h>
 
 
@@ -46,7 +47,6 @@ extern "C" {
 //  - bvh_t has no bvh_setup() function.
 ////////////////////////////////////////////////////////////////////////////////
 
-typedef struct face_t face_t;
 typedef struct allocator_t allocator_t;
 typedef struct binary_stream_t binary_stream_t;
 
@@ -76,12 +76,10 @@ struct bvh_node_t {
 // cache alignment in the future.
 typedef
 struct bvh_t {
-  face_t *faces;
-  vector3f *normals;
-  bvh_aabb_t *bounds;
-  uint32_t count;
-  bvh_node_t *nodes;
-  uint32_t nodes_used;
+  cvector_t faces;          // face_t
+  cvector_t normals;        // vector3f
+  cvector_t bounds;         // bhv_aabb_t
+  cvector_t nodes;          // bvh_node_t
 } bvh_t;
 
 ENTITY_API
