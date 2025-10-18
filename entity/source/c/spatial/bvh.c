@@ -73,6 +73,7 @@ bvh_deserialize(
   {
     uint32_t i = 0;
     bvh_t *bvh = (bvh_t *)dst;
+    bvh_def(bvh);
     cvector_deserialize(&bvh->normals, allocator, stream);
     cvector_deserialize(&bvh->faces, allocator, stream);
     cvector_deserialize(&bvh->bounds, allocator, stream);
