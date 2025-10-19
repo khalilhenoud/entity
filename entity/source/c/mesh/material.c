@@ -13,7 +13,6 @@
 #include <library/core/core.h>
 #include <library/type_registry/type_registry.h>
 #include <library/allocator/allocator.h>
-#include <library/string/cstring.h>
 #include <entity/c/mesh/material.h>
 
 
@@ -50,7 +49,7 @@ material_serialize(
 
   {
     const material_t *material = (const material_t *)src;
-    cstring_serialize(material->name, stream);
+    cstring_serialize(&material->name, stream);
     binary_stream_write(stream, &material->ambient, sizeof(color_rgba_t));
     binary_stream_write(stream, &material->diffuse, sizeof(color_rgba_t));
     binary_stream_write(stream, &material->specular, sizeof(color_rgba_t));
@@ -82,9 +81,8 @@ material_deserialize(
 
   {
     material_t *material = (material_t *)dst;
-    material->name = (cstring_t *)allocator->mem_alloc(sizeof(cstring_t));
-    cstring_def(material->name);
-    cstring_deserialize(material->name, allocator, stream);
+    cstring_def(&material->name);
+    cstring_deserialize(&material->name, allocator, stream);
     binary_stream_read(
       stream, (uint8_t *)&material->ambient, 
       sizeof(color_rgba_t), sizeof(color_rgba_t));
@@ -158,7 +156,7 @@ material_cleanup(
 
   {
     material_t *material = (material_t *)ptr;
-    cstring_free(material->name, allocator);
+    cstring_cleanup2(&material->name);
   }
 }
 
@@ -179,7 +177,8 @@ material_setup(
   assert(material && material_is_def(material));
   assert(name);
 
-  material->name = cstring_create(name, allocator);
+  cstring_def(&material->name);
+  cstring_setup(&material->name, name, allocator);
   material->ambient = ambient;
   material->diffuse = diffuse;
   material->specular = specular;

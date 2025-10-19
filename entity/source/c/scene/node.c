@@ -13,7 +13,6 @@
 #include <library/core/core.h>
 #include <library/type_registry/type_registry.h>
 #include <library/allocator/allocator.h>
-#include <library/string/cstring.h>
 #include <entity/c/scene/node.h>
 
 
@@ -51,7 +50,7 @@ node_serialize(
   {
     uint32_t i = 0;
     const node_t *node = (const node_t *)src;
-    cstring_serialize(node->name, stream);
+    cstring_serialize(&node->name, stream);
     binary_stream_write(stream, &node->transform, sizeof(matrix4f));
     binary_stream_write(stream, &node->meshes.count, sizeof(uint32_t));
     for (i = 0; i < node->meshes.count; ++i)
@@ -73,9 +72,8 @@ node_deserialize(
   {
     uint32_t i = 0;
     node_t *node = (node_t *)dst;
-    node->name = (cstring_t *)allocator->mem_alloc(sizeof(cstring_t));
-    cstring_def(node->name);
-    cstring_deserialize(node->name, allocator, stream);
+    cstring_def(&node->name);
+    cstring_deserialize(&node->name, allocator, stream);
     binary_stream_read(
       stream, (uint8_t *)&node->transform, 
       sizeof(matrix4f), sizeof(matrix4f));
@@ -138,7 +136,7 @@ node_cleanup(
 
   {
     node_t *node = (node_t *)ptr;
-    cstring_free(node->name, allocator);
+    cstring_cleanup2(&node->name);
 
     if (node->meshes.count) {
       assert(node->meshes.indices);

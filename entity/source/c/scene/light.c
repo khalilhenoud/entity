@@ -13,7 +13,6 @@
 #include <library/core/core.h>
 #include <library/type_registry/type_registry.h>
 #include <library/allocator/allocator.h>
-#include <library/string/cstring.h>
 #include <entity/c/scene/light.h>
 
 
@@ -50,7 +49,7 @@ light_serialize(
 
   {
     const light_t *light = (const light_t *)src;
-    cstring_serialize(light->name, stream);
+    cstring_serialize(&light->name, stream);
     binary_stream_write(stream, &light->position, sizeof(vector3f));
     binary_stream_write(stream, &light->direction, sizeof(vector3f));
     binary_stream_write(stream, &light->up, sizeof(vector3f));
@@ -76,9 +75,8 @@ light_deserialize(
 
   {
     light_t *light = (light_t *)dst;
-    light->name = (cstring_t *)allocator->mem_alloc(sizeof(cstring_t));
-    cstring_def(light->name);
-    cstring_deserialize(light->name, allocator, stream);
+    cstring_def(&light->name);
+    cstring_deserialize(&light->name, allocator, stream);
     binary_stream_read(stream, 
       (uint8_t *)&light->position, sizeof(vector3f), sizeof(vector3f));
     binary_stream_read(stream, 
@@ -134,7 +132,7 @@ light_cleanup(
 
   {
     light_t *light = (light_t *)ptr;
-    cstring_free(light->name, allocator);
+    cstring_cleanup2(&light->name);
   }
 }
 
@@ -161,7 +159,7 @@ light_setup(
   assert(light && light_is_def(light));
   assert(name);
 
-  light->name = cstring_create(name, allocator);
+  cstring_setup(&light->name, name, allocator);
   light->position = position;
   light->direction = direction;
   light->up = up;

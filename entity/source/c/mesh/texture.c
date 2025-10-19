@@ -13,7 +13,6 @@
 #include <library/core/core.h>
 #include <library/type_registry/type_registry.h>
 #include <library/allocator/allocator.h>
-#include <library/string/cstring.h>
 #include <entity/c/mesh/texture.h>
 
 
@@ -37,7 +36,7 @@ texture_is_def(const void *ptr)
     const texture_t *texture = (const texture_t *)ptr;
     texture_t def; 
     texture_def(&def);
-    return texture->path == def.path;
+    return !memcmp(texture, &def, sizeof(texture_t));
   }
 }
 
@@ -50,7 +49,7 @@ texture_serialize(
 
   {
     const texture_t *texture = (const texture_t *)src;
-    cstring_serialize(texture->path, stream);
+    cstring_serialize(&texture->path, stream);
   }
 }
 
@@ -64,9 +63,8 @@ texture_deserialize(
 
   {
     texture_t *texture = (texture_t *)dst;
-    texture->path = (cstring_t *)allocator->mem_alloc(sizeof(cstring_t));
-    cstring_def(texture->path);
-    cstring_deserialize(texture->path, allocator, stream);
+    cstring_def(&texture->path);
+    cstring_deserialize(&texture->path, allocator, stream);
   }
 }
 
@@ -98,7 +96,7 @@ texture_cleanup(
 
   {
     texture_t *texture = (texture_t *)ptr;
-    cstring_free(texture->path, allocator);
+    cstring_cleanup2(&texture->path);
   }
 }
 
@@ -113,7 +111,8 @@ texture_setup(
   assert(texture && texture_is_def(texture));
   assert(path);
 
-  texture->path = cstring_create(path, allocator);
+  cstring_def(&texture->path);
+  cstring_setup(&texture->path, path, allocator);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

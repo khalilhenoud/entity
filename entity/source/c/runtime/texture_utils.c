@@ -29,9 +29,8 @@ create_texture_runtime(
       (texture_runtime_t*)allocator->mem_alloc(sizeof(texture_runtime_t));
     memset(runtime, 0, sizeof(texture_runtime_t));
     
-    runtime->texture.path = allocator->mem_alloc(sizeof(cstring_t));
-    cstring_def(runtime->texture.path);
-    cstring_setup(runtime->texture.path, texture->path->str, allocator);
+    cstring_def(&runtime->texture.path);
+    cstring_setup(&runtime->texture.path, texture->path.str, allocator);
 
     return runtime;
   }
@@ -62,10 +61,7 @@ free_texture_runtime_internal(
     allocator->mem_free(runtime->buffer);
   }
 
-  if (runtime->texture.path) {
-    cstring_cleanup(runtime->texture.path, NULL);
-    allocator->mem_free(runtime->texture.path);
-  }
+  cstring_cleanup2(&runtime->texture.path);
 }
 
 void
@@ -131,7 +127,7 @@ get_image_component_count(const image_t* image)
 void
 get_image_extension(const image_t* image, uint8_t extension[8])
 {
-  uint8_t* at = strrchr(image->texture.path->str, '.');
+  uint8_t* at = strrchr(image->texture.path.str, '.');
   assert(at && "File has no extension '.' separator!");
   assert(strlen(at + 1) < 8 && "Extension is longer than 8 character!");
 

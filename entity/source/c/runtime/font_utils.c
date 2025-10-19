@@ -28,13 +28,11 @@ create_font_runtime(
       (font_runtime_t*)allocator->mem_alloc(sizeof(font_runtime_t));
     memset(runtime, 0, sizeof(font_runtime_t));
 
-    runtime->font.image_file = allocator->mem_alloc(sizeof(cstring_t));
-    cstring_def(runtime->font.image_file);
-    cstring_setup(runtime->font.image_file, font->image_file->str, allocator);
+    cstring_def(&runtime->font.image_file);
+    cstring_setup(&runtime->font.image_file, font->image_file.str, allocator);
 
-    runtime->font.data_file = allocator->mem_alloc(sizeof(cstring_t));
-    cstring_def(runtime->font.data_file);
-    cstring_setup(runtime->font.data_file, font->data_file->str, allocator);
+    cstring_def(&runtime->font.data_file);
+    cstring_setup(&runtime->font.data_file, font->data_file.str, allocator);
 
     return runtime;
   }
@@ -57,11 +55,8 @@ free_font_runtime_internal(
   assert(allocator != NULL);
   assert(runtime != NULL && "runtime is NULL!");
 
-  cstring_cleanup(runtime->font.image_file, NULL);
-  allocator->mem_free(runtime->font.image_file);
-
-  cstring_cleanup(runtime->font.data_file, NULL);
-  allocator->mem_free(runtime->font.data_file);
+  cstring_cleanup2(&runtime->font.image_file);
+  cstring_cleanup2(&runtime->font.data_file);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

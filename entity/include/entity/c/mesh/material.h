@@ -18,6 +18,7 @@ extern "C" {
 #include <stdint.h>
 #include <entity/c/internal/module.h>
 #include <entity/c/mesh/color.h>
+#include <library/string/cstring.h>
 
 #define MAX_TEXTURE_COUNT_PER_MATERIAL          8
 
@@ -48,7 +49,6 @@ extern "C" {
 ////////////////////////////////////////////////////////////////////////////////
 
 typedef struct allocator_t allocator_t;
-typedef struct cstring_t cstring_t;
 typedef struct binary_stream_t binary_stream_t;
 
 typedef
@@ -67,7 +67,7 @@ struct texture_properties_array_t {
 
 typedef
 struct material_t {
-  cstring_t *name;
+  cstring_t name;
   color_rgba_t ambient;
   color_rgba_t diffuse;
   color_rgba_t specular;

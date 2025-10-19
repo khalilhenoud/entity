@@ -17,6 +17,7 @@ extern "C" {
 
 #include <stdint.h>
 #include <entity/c/internal/module.h>
+#include <library/string/cstring.h>
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -45,13 +46,12 @@ extern "C" {
 ////////////////////////////////////////////////////////////////////////////////
 
 typedef struct allocator_t allocator_t;
-typedef struct cstring_t cstring_t;
 typedef struct binary_stream_t binary_stream_t;
 
 typedef
 struct font_t {
-  cstring_t *image_file;
-  cstring_t *data_file;
+  cstring_t image_file;
+  cstring_t data_file;
 } font_t;
 
 ENTITY_API

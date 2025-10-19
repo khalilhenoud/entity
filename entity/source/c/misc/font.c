@@ -13,7 +13,6 @@
 #include <library/core/core.h>
 #include <library/type_registry/type_registry.h>
 #include <library/allocator/allocator.h>
-#include <library/string/cstring.h>
 #include <entity/c/misc/font.h>
 
 
@@ -35,9 +34,9 @@ font_is_def(const void *ptr)
 
   {
     const font_t *font = (const font_t *)ptr;
-    return 
-      font->image_file == NULL && 
-      font->data_file == NULL;
+    font_t def; 
+    font_def(&def);
+    return !memcmp(font, &def, sizeof(font_t));
   }
 }
 
@@ -50,8 +49,8 @@ font_serialize(
 
   {
     const font_t *font = (const font_t *)src;
-    cstring_serialize(font->image_file, stream);
-    cstring_serialize(font->data_file, stream);
+    cstring_serialize(&font->image_file, stream);
+    cstring_serialize(&font->data_file, stream);
   }
 }
 
@@ -65,13 +64,11 @@ font_deserialize(
 
   {
     font_t *font = (font_t *)dst;
-    font->image_file = (cstring_t *)allocator->mem_alloc(sizeof(cstring_t));
-    cstring_def(font->image_file);
-    cstring_deserialize(font->image_file, allocator, stream);
+    cstring_def(&font->image_file);
+    cstring_deserialize(&font->image_file, allocator, stream);
 
-    font->data_file = (cstring_t *)allocator->mem_alloc(sizeof(cstring_t));
-    cstring_def(font->data_file);
-    cstring_deserialize(font->data_file, allocator, stream);
+    cstring_def(&font->data_file);
+    cstring_deserialize(&font->data_file, allocator, stream);
   }
 }
 
@@ -103,8 +100,8 @@ font_cleanup(
 
   {
     font_t *font = (font_t *)ptr;
-    cstring_free(font->image_file, allocator);
-    cstring_free(font->data_file, allocator);
+    cstring_cleanup2(&font->image_file);
+    cstring_cleanup2(&font->data_file);
   }
 }
 
@@ -123,8 +120,11 @@ font_setup(
     data_file && 
     "image file or data file are NULL!");
 
-  font->image_file = cstring_create(image_file, allocator);
-  font->data_file = cstring_create(data_file, allocator);
+  cstring_def(&font->image_file);
+  cstring_setup(&font->image_file, image_file, allocator);
+
+  cstring_def(&font->data_file);
+  cstring_setup(&font->data_file, data_file, allocator);
 }
 
 font_t*

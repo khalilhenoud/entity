@@ -17,6 +17,7 @@ extern "C" {
 
 #include <stdint.h>
 #include <entity/c/internal/module.h>
+#include <library/string/cstring.h>
 #include <math/c/matrix4f.h>
 
 
@@ -47,7 +48,6 @@ extern "C" {
 ////////////////////////////////////////////////////////////////////////////////
 
 typedef struct allocator_t allocator_t;
-typedef struct cstring_t cstring_t;
 typedef struct binary_stream_t binary_stream_t;
 
 // Indicies into the scene payloads.
@@ -59,7 +59,7 @@ struct payload_indices_t {
 
 typedef
 struct node_t {
-  cstring_t *name;
+  cstring_t name;
   matrix4f transform;
   payload_indices_t meshes;
   payload_indices_t nodes;

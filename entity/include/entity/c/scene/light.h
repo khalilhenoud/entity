@@ -18,6 +18,7 @@ extern "C" {
 #include <stdint.h>
 #include <entity/c/internal/module.h>
 #include <entity/c/mesh/color.h>
+#include <library/string/cstring.h>
 #include <math/c/vector3f.h>
 
 
@@ -47,7 +48,6 @@ extern "C" {
 ////////////////////////////////////////////////////////////////////////////////
 
 typedef struct allocator_t allocator_t;
-typedef struct cstring_t cstring_t;
 typedef struct binary_stream_t binary_stream_t;
 
 typedef
@@ -66,7 +66,7 @@ enum light_type_t {
 //  - final_attenuation = 1/(constant_att + linear_att * d + quad_att * d*d).
 typedef
 struct light_t {
-  cstring_t *name;
+  cstring_t name;
   vector3f position;
   vector3f direction;
   vector3f up;
