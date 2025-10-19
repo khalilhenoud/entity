@@ -473,7 +473,7 @@ construct_bvh_naive(bvh_t *bvh, const allocator_t *allocator)
   bvh_node_t *root = cvector_as(&bvh->nodes, 0, bvh_node_t);
   // this will allow us to skip the first node after the root, ensuring the left
   // and right nodes are on the same cacheline once aligned.
-  uint32_t nodes_used = 0;
+  uint32_t nodes_used = 2;
   root->left_first = root->tri_count = 0;
   subdivide_naive(bvh, 0, bvh->faces.size, 0, &nodes_used);
   cvector_resize(&bvh->nodes, nodes_used);
