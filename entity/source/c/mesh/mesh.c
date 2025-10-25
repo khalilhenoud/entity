@@ -71,9 +71,13 @@ mesh_deserialize(
 
   {
     mesh_t *mesh = (mesh_t *)dst;
+    cvector_def(&mesh->vertices);
     cvector_deserialize(&mesh->vertices, allocator, stream);
+    cvector_def(&mesh->normals);
     cvector_deserialize(&mesh->normals, allocator, stream);
+    cvector_def(&mesh->uvs);
     cvector_deserialize(&mesh->uvs, allocator, stream);
+    cvector_def(&mesh->indices);
     cvector_deserialize(&mesh->indices, allocator, stream);
     binary_stream_read(
       stream, (uint8_t *)mesh->materials.indices, 
