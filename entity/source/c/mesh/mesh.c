@@ -52,21 +52,12 @@ mesh_serialize(
 
   {
     const mesh_t *mesh = (const mesh_t *)src;
-    size_t vtx_total = sizeof(float) * 3 * mesh->vertices_count;
-    size_t idx_total = sizeof(uint32_t) * mesh->indices_count;
-    size_t mtx_total = sizeof(uint32_t) * MAX_MATERIAL_NUMBER;
-    binary_stream_write(stream, &mesh->vertices_count, sizeof(uint32_t));
-    binary_stream_write(stream, &mesh->indices_count, sizeof(uint32_t));
-    binary_stream_write(stream, &mesh->materials.used, sizeof(uint32_t));
-    if (vtx_total) {
-      binary_stream_write(stream, mesh->vertices, vtx_total);
-      binary_stream_write(stream, mesh->normals, vtx_total);
-      binary_stream_write(stream, mesh->uvs, vtx_total);
-    }
-    if (idx_total)
-      binary_stream_write(stream, mesh->indices, idx_total);
-    if (mtx_total)
-      binary_stream_write(stream, mesh->materials.indices, mtx_total);
+    cvector_serialize(&mesh->vertices, stream);
+    cvector_serialize(&mesh->normals, stream);
+    cvector_serialize(&mesh->uvs, stream);
+    cvector_serialize(&mesh->indices, stream);
+    binary_stream_write(
+      stream, mesh->materials.indices, sizeof(uint32_t) * MAX_MATERIAL_NUMBER);
   }
 }
 
@@ -79,46 +70,15 @@ mesh_deserialize(
   assert(dst && allocator && stream);
 
   {
-    size_t mtx_total = sizeof(uint32_t) * MAX_MATERIAL_NUMBER;
     mesh_t *mesh = (mesh_t *)dst;
-    binary_stream_read(
-      stream, (uint8_t *)&mesh->vertices_count, 
-      sizeof(uint32_t), sizeof(uint32_t));
-    binary_stream_read(
-      stream, (uint8_t *)&mesh->indices_count, 
-      sizeof(uint32_t), sizeof(uint32_t));
-    binary_stream_read(
-      stream, (uint8_t *)&mesh->materials.used, 
-      sizeof(uint32_t), sizeof(uint32_t));
-    
-    {
-      size_t vtx_total = sizeof(float) * 3 * mesh->vertices_count;
-      size_t idx_total = sizeof(uint32_t) * mesh->indices_count;
-      mesh->vertices = NULL;
-      mesh->normals = NULL;
-      mesh->uvs = NULL;
-      mesh->indices = NULL;
-      if (vtx_total) {
-        mesh->vertices = (float*)allocator->mem_alloc(vtx_total);
-        mesh->normals = (float*)allocator->mem_alloc(vtx_total);
-        mesh->uvs = (float*)allocator->mem_alloc(vtx_total);
-        binary_stream_read(
-          stream, (uint8_t*)mesh->vertices, vtx_total, vtx_total);
-        binary_stream_read(
-          stream, (uint8_t*)mesh->normals, vtx_total, vtx_total);
-        binary_stream_read(
-          stream, (uint8_t*)mesh->uvs, vtx_total, vtx_total);
-      }
-      if (idx_total) {
-        mesh->indices = (uint32_t*)allocator->mem_alloc(idx_total);
-        binary_stream_read(
-          stream, (uint8_t*)mesh->indices, idx_total, idx_total);
-      }
-    }
-
+    cvector_deserialize(&mesh->vertices, allocator, stream);
+    cvector_deserialize(&mesh->normals, allocator, stream);
+    cvector_deserialize(&mesh->uvs, allocator, stream);
+    cvector_deserialize(&mesh->indices, allocator, stream);
     binary_stream_read(
       stream, (uint8_t *)mesh->materials.indices, 
-      mtx_total, mtx_total);
+      sizeof(uint32_t) * MAX_MATERIAL_NUMBER, 
+      sizeof(uint32_t) * MAX_MATERIAL_NUMBER);
   }
 }
 
@@ -150,13 +110,10 @@ mesh_cleanup(
 
   {
     mesh_t *mesh = (mesh_t *)ptr;
-    if (mesh->vertices_count) {
-      allocator->mem_free(mesh->vertices);
-      allocator->mem_free(mesh->normals);
-      allocator->mem_free(mesh->uvs);
-    }
-    if (mesh->indices_count)
-      allocator->mem_free(mesh->indices);
+    cvector_cleanup2(&mesh->vertices);
+    cvector_cleanup2(&mesh->normals);
+    cvector_cleanup2(&mesh->uvs);
+    cvector_cleanup2(&mesh->indices);
     memset(mesh, 0, sizeof(mesh_t));
   }
 }
@@ -181,17 +138,24 @@ mesh_setup(
   {
     size_t vtotal = sizeof(float) * vertices_count * 3;
     size_t itotal = sizeof(uint32_t) * indices_count;
-    mesh->vertices_count = vertices_count;
-    mesh->indices_count = indices_count;
+    
+    cvector_setup(&mesh->vertices, get_type_data(float), 0, allocator);
+    cvector_resize(&mesh->vertices, vertices_count * 3);
+    memcpy(mesh->vertices.data, vertices, vtotal);
+    
+    cvector_setup(&mesh->normals, get_type_data(float), 0, allocator);
+    cvector_resize(&mesh->normals, vertices_count * 3);
+    memcpy(mesh->normals.data, normals, vtotal);
+
+    cvector_setup(&mesh->uvs, get_type_data(float), 0, allocator);
+    cvector_resize(&mesh->uvs, vertices_count * 3);
+    memcpy(mesh->uvs.data, uvs, vtotal);
+    
+    cvector_setup(&mesh->indices, get_type_data(uint32_t), 0, allocator);
+    cvector_resize(&mesh->indices, indices_count);
+    memcpy(mesh->indices.data, indices, itotal);
+
     mesh->materials = materials;
-    mesh->vertices = (float*)allocator->mem_alloc(vtotal);
-    memcpy(mesh->vertices, vertices, vtotal);
-    mesh->normals = (float*)allocator->mem_alloc(vtotal);
-    memcpy(mesh->normals, normals, vtotal);
-    mesh->uvs = (float*)allocator->mem_alloc(vtotal);
-    memcpy(mesh->uvs, uvs, vtotal);
-    mesh->indices = (uint32_t*)allocator->mem_alloc(itotal);
-    memcpy(mesh->indices, indices, itotal);
   }
 }
 

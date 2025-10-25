@@ -24,11 +24,11 @@ typedef struct allocator_t allocator_t;
 
 ENTITY_API
 mesh_t*
-create_unit_cube(const allocator_t* allocator);
+create_unit_cube(const allocator_t *allocator);
 
 ENTITY_API
 mesh_t*
-create_unit_sphere(const int32_t factor, const allocator_t* allocator);
+create_unit_sphere(const int32_t factor, const allocator_t *allocator);
 
 ENTITY_API
 mesh_t*

@@ -17,6 +17,7 @@ extern "C" {
 
 #include <stdint.h>
 #include <entity/c/internal/module.h>
+#include <library/containers/cvector.h>
 
 #define MAX_MATERIAL_NUMBER           4
 
@@ -57,12 +58,10 @@ struct material_array_t {
 
 typedef
 struct mesh_t {
-  float *vertices;
-  float *normals;
-  float *uvs;
-  uint32_t vertices_count;
-  uint32_t *indices;
-  uint32_t indices_count;
+  cvector_t vertices;           // float
+  cvector_t normals;            // float
+  cvector_t uvs;                // float
+  cvector_t indices;            // uint32_t
   material_array_t materials;
 } mesh_t;
 
@@ -85,7 +84,7 @@ void
 mesh_deserialize(
   void *dst, 
   const allocator_t *allocator, 
-  binary_stream_t* stream);
+  binary_stream_t *stream);
 
 ENTITY_API
 size_t 
@@ -103,7 +102,7 @@ ENTITY_API
 void 
 mesh_cleanup(
   void *ptr, 
-  const allocator_t* allocator);
+  const allocator_t *allocator);
 
 ////////////////////////////////////////////////////////////////////////////////
 ENTITY_API

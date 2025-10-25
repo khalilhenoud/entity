@@ -99,25 +99,24 @@ create_unit_cube(const allocator_t* allocator)
   assert(mesh != NULL);
   memset(mesh, 0, sizeof(mesh_t));
 
-  mesh->vertices = (float*)allocator->mem_alloc(
-    sizeof(float) * 3 * vertices_count);
-  mesh->vertices_count = vertices_count;
+  cvector_setup(&mesh->vertices, get_type_data(float), 0, allocator);
+  cvector_resize(&mesh->vertices, vertices_count * 3);
 
-  mesh->normals = (float*)allocator->mem_alloc(
-    sizeof(float) * 3 * vertices_count);
-  mesh->uvs = (float*)allocator->mem_alloc(
-    sizeof(float) * 3 * vertices_count);
-  memset(mesh->uvs, 0, sizeof(float) * 3 * vertices_count);
+  cvector_setup(&mesh->normals, get_type_data(float), 0, allocator);
+  cvector_resize(&mesh->normals, vertices_count * 3);
 
-  mesh->indices = (uint32_t*)allocator->mem_alloc(
-    sizeof(uint32_t) * indices_count);
-  mesh->indices_count = indices_count;
+  cvector_setup(&mesh->uvs, get_type_data(float), 0, allocator);
+  cvector_resize(&mesh->uvs, vertices_count * 3);
+  memset(mesh->uvs.data, 0, sizeof(float) * 3 * vertices_count);
+
+  cvector_setup(&mesh->indices, get_type_data(uint32_t), 0, allocator);
+  cvector_resize(&mesh->indices, indices_count);
 
   {
-    float* vertices = mesh->vertices;
-    float* normals = mesh->normals;
-    float* uvs = mesh->uvs;
-    uint32_t* indices = mesh->indices;
+    float *vertices = mesh->vertices.data;
+    float *normals = mesh->normals.data;
+    float *uvs = mesh->uvs.data;
+    uint32_t *indices = mesh->indices.data;
     matrix4f transform[6];
     matrix4f_set_identity(&transform[0]);
     matrix4f_rotation_y(&transform[1], K_PI/2.f);
@@ -151,40 +150,44 @@ create_unit_sphere(const int32_t factor, const allocator_t* allocator)
   uint32_t vertices_count = factor * factor * 4 + 2;
   uint32_t faces_count = factor * 4 * 2 + (factor - 1) * (factor * 4 * 2); 
   uint32_t indices_count = faces_count * 3;
+  float *vertices = NULL, *normals = NULL;
+  uint32_t *indices = NULL;
 
   mesh_t* mesh = (mesh_t*)allocator->mem_alloc(sizeof(mesh_t));  
   assert(mesh != NULL);
   assert(factor >= 1);
   memset(mesh, 0, sizeof(mesh_t));
 
-  mesh->vertices = (float*)allocator->mem_alloc(
-    sizeof(float) * 3 * vertices_count);
-  mesh->vertices_count = vertices_count;
+  cvector_setup(&mesh->vertices, get_type_data(float), 0, allocator);
+  cvector_resize(&mesh->vertices, vertices_count * 3);
+  vertices = mesh->vertices.data;
 
-  mesh->normals = (float*)allocator->mem_alloc(
-    sizeof(float) * 3 * vertices_count);
-  mesh->uvs = (float*)allocator->mem_alloc(
-    sizeof(float) * 3 * vertices_count);
-  memset(mesh->uvs, 0, sizeof(float) * 3 * vertices_count);
+  cvector_setup(&mesh->normals, get_type_data(float), 0, allocator);
+  cvector_resize(&mesh->normals, vertices_count * 3);
+  normals = mesh->normals.data;
 
-  mesh->indices = (uint32_t*)allocator->mem_alloc(
-    sizeof(uint32_t) * indices_count);
-  mesh->indices_count = indices_count;
+  cvector_setup(&mesh->uvs, get_type_data(float), 0, allocator);
+  cvector_resize(&mesh->uvs, vertices_count * 3);
+  memset(mesh->uvs.data, 0, sizeof(float) * 3 * vertices_count);
+
+  cvector_setup(&mesh->indices, get_type_data(uint32_t), 0, allocator);
+  cvector_resize(&mesh->indices, indices_count);
+  indices = mesh->indices.data;
 
   // push the top and bottom vertices (0, 1, 0), (0, -1, 0) respectively.
-  mesh->vertices[0 * 3 + 0] = 0.f;
-  mesh->vertices[0 * 3 + 1] = 1.f;
-  mesh->vertices[0 * 3 + 2] = 0.f;
-  mesh->normals[0 * 3 + 0] = 0.f;
-  mesh->normals[0 * 3 + 1] = 1.f;
-  mesh->normals[0 * 3 + 2] = 0.f;
+  vertices[0 * 3 + 0] = 0.f;
+  vertices[0 * 3 + 1] = 1.f;
+  vertices[0 * 3 + 2] = 0.f;
+  normals[0 * 3 + 0] = 0.f;
+  normals[0 * 3 + 1] = 1.f;
+  normals[0 * 3 + 2] = 0.f;
 
-  mesh->vertices[(vertices_count - 1) * 3 + 0] = 0.f;
-  mesh->vertices[(vertices_count - 1) * 3 + 1] = -1.f;
-  mesh->vertices[(vertices_count - 1) * 3 + 2] = 0.f;
-  mesh->normals[(vertices_count - 1) * 3 + 0] = 0.f;
-  mesh->normals[(vertices_count - 1) * 3 + 1] = -1.f;
-  mesh->normals[(vertices_count - 1) * 3 + 2] = 0.f;
+  vertices[(vertices_count - 1) * 3 + 0] = 0.f;
+  vertices[(vertices_count - 1) * 3 + 1] = -1.f;
+  vertices[(vertices_count - 1) * 3 + 2] = 0.f;
+  normals[(vertices_count - 1) * 3 + 0] = 0.f;
+  normals[(vertices_count - 1) * 3 + 1] = -1.f;
+  normals[(vertices_count - 1) * 3 + 2] = 0.f;
 
   for (int32_t level = 1, current_vertex = 1; level <= factor; ++level) {
     double height_angle_total = height_angle_increment * level;
@@ -199,12 +202,12 @@ create_unit_sphere(const int32_t factor, const allocator_t* allocator)
       double horizontal_offset = cos(ring_angle) * radius;   // x
       double depth_offset = sin(ring_angle) * radius;        // z
 
-      mesh->vertices[current_vertex * 3 + 0] = horizontal_offset;
-      mesh->vertices[current_vertex * 3 + 1] = height;
-      mesh->vertices[current_vertex * 3 + 2] = depth_offset;
-      mesh->normals[current_vertex * 3 + 0] = horizontal_offset;
-      mesh->normals[current_vertex * 3 + 1] = height;
-      mesh->normals[current_vertex * 3 + 2] = depth_offset;
+      vertices[current_vertex * 3 + 0] = horizontal_offset;
+      vertices[current_vertex * 3 + 1] = height;
+      vertices[current_vertex * 3 + 2] = depth_offset;
+      normals[current_vertex * 3 + 0] = horizontal_offset;
+      normals[current_vertex * 3 + 1] = height;
+      normals[current_vertex * 3 + 2] = depth_offset;
       ++current_vertex;
     }
   }
@@ -219,9 +222,9 @@ create_unit_sphere(const int32_t factor, const allocator_t* allocator)
       int32_t i = 0; 
       i < faces_per_ring; 
       ++starting_vertex, ++current_face, ++i) {
-      mesh->indices[current_face * 3 + 2] = 0;
-      mesh->indices[current_face * 3 + 1] = starting_vertex + 0;
-      mesh->indices[current_face * 3 + 0] = 
+      indices[current_face * 3 + 2] = 0;
+      indices[current_face * 3 + 1] = starting_vertex + 0;
+      indices[current_face * 3 + 0] = 
         starting_vertex + 1 - ((i == faces_per_ring - 1) ? faces_per_ring : 0);
     }
 
@@ -235,14 +238,14 @@ create_unit_sphere(const int32_t factor, const allocator_t* allocator)
           starting_vertex + 1 - 
           ((i == faces_per_ring - 1) ? faces_per_ring : 0);
 
-        mesh->indices[current_face * 3 + 2] = starting_vertex;
-        mesh->indices[current_face * 3 + 1] = starting_vertex + faces_per_ring;
-        mesh->indices[current_face * 3 + 0] = next_vertex;
+        indices[current_face * 3 + 2] = starting_vertex;
+        indices[current_face * 3 + 1] = starting_vertex + faces_per_ring;
+        indices[current_face * 3 + 0] = next_vertex;
         ++current_face;
 
-        mesh->indices[current_face * 3 + 2] = next_vertex;
-        mesh->indices[current_face * 3 + 1] = starting_vertex + faces_per_ring;
-        mesh->indices[current_face * 3 + 0] = next_vertex + faces_per_ring;
+        indices[current_face * 3 + 2] = next_vertex;
+        indices[current_face * 3 + 1] = starting_vertex + faces_per_ring;
+        indices[current_face * 3 + 0] = next_vertex + faces_per_ring;
         ++current_face;
       }
     }
@@ -253,9 +256,9 @@ create_unit_sphere(const int32_t factor, const allocator_t* allocator)
       int32_t i = 0; 
       i < faces_per_ring; 
       ++starting_vertex, ++current_face, ++i) {
-      mesh->indices[current_face * 3 + 2] = starting_vertex + 0;
-      mesh->indices[current_face * 3 + 1] = vertices_count - 1;
-      mesh->indices[current_face * 3 + 0] = 
+      indices[current_face * 3 + 2] = starting_vertex + 0;
+      indices[current_face * 3 + 1] = vertices_count - 1;
+      indices[current_face * 3 + 0] = 
         starting_vertex + 1 - ((i == faces_per_ring - 1) ? faces_per_ring : 0);
     }
   }
@@ -287,6 +290,8 @@ create_unit_capsule(
   float total_sections = half_height_to_radius_ratio + 1.f;
   float height_to_add = (1.f / total_sections) * half_height_to_radius_ratio;
   float radius_ratio = height_to_add * 1.f / half_height_to_radius_ratio;
+  float *vertices = NULL, *normals = NULL;
+  uint32_t *indices = NULL;
 
   mesh_t* mesh = (mesh_t*)allocator->mem_alloc(sizeof(mesh_t));
   assert(mesh != NULL);
@@ -294,42 +299,36 @@ create_unit_capsule(
   assert(factor >= 1);
   memset(mesh, 0, sizeof(mesh_t));
 
-  mesh->materials.used = 0;
+  cvector_setup(&mesh->vertices, get_type_data(float), 0, allocator);
+  cvector_resize(&mesh->vertices, vertices_count * 3);
+  vertices = mesh->vertices.data;
 
-  {
-    mesh->vertices = NULL;
-    mesh->normals = NULL;
-    mesh->uvs = NULL;
-    mesh->indices = NULL;
-  }
+  cvector_setup(&mesh->normals, get_type_data(float), 0, allocator);
+  cvector_resize(&mesh->normals, vertices_count * 3);
+  normals = mesh->normals.data;
 
-  mesh->vertices = (float*)allocator->mem_alloc(
-    sizeof(float) * 3 * vertices_count);
-  mesh->vertices_count = vertices_count;
+  cvector_setup(&mesh->uvs, get_type_data(float), 0, allocator);
+  cvector_resize(&mesh->uvs, vertices_count * 3);
+  memset(mesh->uvs.data, 0, sizeof(float) * 3 * vertices_count);
 
-  mesh->normals = (float*)allocator->mem_alloc(
-    sizeof(float) * 3 * vertices_count);
-  mesh->uvs = (float*)allocator->mem_alloc(sizeof(float) * 3 * vertices_count);
-  memset(mesh->uvs, 0, sizeof(float) * 3 * vertices_count);
-
-  mesh->indices = (uint32_t*)allocator->mem_alloc(
-    sizeof(uint32_t) * indices_count);
-  mesh->indices_count = indices_count;
+  cvector_setup(&mesh->indices, get_type_data(uint32_t), 0, allocator);
+  cvector_resize(&mesh->indices, indices_count);
+  indices = mesh->indices.data;
 
   // push the top and bottom vertices (0, 1, 0), (0, -1, 0) respectively.
-  mesh->vertices[0 * 3 + 0] = 0.f;
-  mesh->vertices[0 * 3 + 1] = 1.f;// + height_to_add;
-  mesh->vertices[0 * 3 + 2] = 0.f;
-  mesh->normals[0 * 3 + 0] = 0.f;
-  mesh->normals[0 * 3 + 1] = 1.f;
-  mesh->normals[0 * 3 + 2] = 0.f;
+  vertices[0 * 3 + 0] = 0.f;
+  vertices[0 * 3 + 1] = 1.f;// + height_to_add;
+  vertices[0 * 3 + 2] = 0.f;
+  normals[0 * 3 + 0] = 0.f;
+  normals[0 * 3 + 1] = 1.f;
+  normals[0 * 3 + 2] = 0.f;
 
-  mesh->vertices[(vertices_count - 1) * 3 + 0] = 0.f;
-  mesh->vertices[(vertices_count - 1) * 3 + 1] = -1.f;// - height_to_add;
-  mesh->vertices[(vertices_count - 1) * 3 + 2] = 0.f;
-  mesh->normals[(vertices_count - 1) * 3 + 0] = 0.f;
-  mesh->normals[(vertices_count - 1) * 3 + 1] = -1.f;
-  mesh->normals[(vertices_count - 1) * 3 + 2] = 0.f;
+  vertices[(vertices_count - 1) * 3 + 0] = 0.f;
+  vertices[(vertices_count - 1) * 3 + 1] = -1.f;// - height_to_add;
+  vertices[(vertices_count - 1) * 3 + 2] = 0.f;
+  normals[(vertices_count - 1) * 3 + 0] = 0.f;
+  normals[(vertices_count - 1) * 3 + 1] = -1.f;
+  normals[(vertices_count - 1) * 3 + 2] = 0.f;
 
   // create the vertices, in case of a mesh we do this in 2 halfs, we also
   // need to duplicate the middle ring's vertices.
@@ -349,12 +348,12 @@ create_unit_capsule(
         double horizontal_offset = cos(ring_angle) * radius;   // x
         double depth_offset = sin(ring_angle) * radius;        // z
 
-        mesh->vertices[current_vertex * 3 + 0] = horizontal_offset;
-        mesh->vertices[current_vertex * 3 + 1] = height + height_to_add;
-        mesh->vertices[current_vertex * 3 + 2] = depth_offset;
-        mesh->normals[current_vertex * 3 + 0] = horizontal_offset;
-        mesh->normals[current_vertex * 3 + 1] = height;
-        mesh->normals[current_vertex * 3 + 2] = depth_offset;
+        vertices[current_vertex * 3 + 0] = horizontal_offset;
+        vertices[current_vertex * 3 + 1] = height + height_to_add;
+        vertices[current_vertex * 3 + 2] = depth_offset;
+        normals[current_vertex * 3 + 0] = horizontal_offset;
+        normals[current_vertex * 3 + 1] = height;
+        normals[current_vertex * 3 + 2] = depth_offset;
         ++current_vertex;
       }
     }
@@ -373,12 +372,12 @@ create_unit_capsule(
         double horizontal_offset = cos(ring_angle) * radius;   // x
         double depth_offset = sin(ring_angle) * radius;        // z
 
-        mesh->vertices[current_vertex * 3 + 0] = horizontal_offset;
-        mesh->vertices[current_vertex * 3 + 1] = height - height_to_add;
-        mesh->vertices[current_vertex * 3 + 2] = depth_offset;
-        mesh->normals[current_vertex * 3 + 0] = horizontal_offset;
-        mesh->normals[current_vertex * 3 + 1] = height;
-        mesh->normals[current_vertex * 3 + 2] = depth_offset;
+        vertices[current_vertex * 3 + 0] = horizontal_offset;
+        vertices[current_vertex * 3 + 1] = height - height_to_add;
+        vertices[current_vertex * 3 + 2] = depth_offset;
+        normals[current_vertex * 3 + 0] = horizontal_offset;
+        normals[current_vertex * 3 + 1] = height;
+        normals[current_vertex * 3 + 2] = depth_offset;
         ++current_vertex;
       }
     }
@@ -394,9 +393,9 @@ create_unit_capsule(
       int32_t i = 0; 
       i < faces_per_ring; 
       ++starting_vertex, ++current_face, ++i) {
-      mesh->indices[current_face * 3 + 2] = 0;
-      mesh->indices[current_face * 3 + 1] = starting_vertex + 0;
-      mesh->indices[current_face * 3 + 0] = 
+      indices[current_face * 3 + 2] = 0;
+      indices[current_face * 3 + 1] = starting_vertex + 0;
+      indices[current_face * 3 + 0] = 
         starting_vertex + 1 - ((i == faces_per_ring - 1) ? faces_per_ring : 0);
     }
 
@@ -413,14 +412,14 @@ create_unit_capsule(
           starting_vertex + 1 - 
           ((i == faces_per_ring - 1) ? faces_per_ring : 0);
 
-        mesh->indices[current_face * 3 + 2] = starting_vertex;
-        mesh->indices[current_face * 3 + 1] = starting_vertex + faces_per_ring;
-        mesh->indices[current_face * 3 + 0] = next_vertex;
+        indices[current_face * 3 + 2] = starting_vertex;
+        indices[current_face * 3 + 1] = starting_vertex + faces_per_ring;
+        indices[current_face * 3 + 0] = next_vertex;
         ++current_face;
 
-        mesh->indices[current_face * 3 + 2] = next_vertex;
-        mesh->indices[current_face * 3 + 1] = starting_vertex + faces_per_ring;
-        mesh->indices[current_face * 3 + 0] = next_vertex + faces_per_ring;
+        indices[current_face * 3 + 2] = next_vertex;
+        indices[current_face * 3 + 1] = starting_vertex + faces_per_ring;
+        indices[current_face * 3 + 0] = next_vertex + faces_per_ring;
         ++current_face;
       }
     }
@@ -431,9 +430,9 @@ create_unit_capsule(
       int32_t i = 0; 
       i < faces_per_ring; 
       ++starting_vertex, ++current_face, ++i) {
-      mesh->indices[current_face * 3 + 2] = starting_vertex + 0;
-      mesh->indices[current_face * 3 + 1] = vertices_count - 1;
-      mesh->indices[current_face * 3 + 0] = starting_vertex + 1 - 
+      indices[current_face * 3 + 2] = starting_vertex + 0;
+      indices[current_face * 3 + 1] = vertices_count - 1;
+      indices[current_face * 3 + 0] = starting_vertex + 1 - 
         ((i == faces_per_ring - 1) ? faces_per_ring : 0);
     }
   }
