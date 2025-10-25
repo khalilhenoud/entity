@@ -48,16 +48,11 @@ node_serialize(
   assert(src && stream);
 
   {
-    uint32_t i = 0;
     const node_t *node = (const node_t *)src;
     cstring_serialize(&node->name, stream);
     binary_stream_write(stream, &node->transform, sizeof(matrix4f));
-    binary_stream_write(stream, &node->meshes.count, sizeof(uint32_t));
-    for (i = 0; i < node->meshes.count; ++i)
-      binary_stream_write(stream, &node->meshes.indices[i], sizeof(uint32_t));
-    binary_stream_write(stream, &node->nodes.count, sizeof(uint32_t));
-    for (i = 0; i < node->nodes.count; ++i)
-      binary_stream_write(stream, &node->nodes.indices[i], sizeof(uint32_t));
+    cvector_serialize(&node->meshes, stream);
+    cvector_serialize(&node->nodes, stream);
   }
 }
 
@@ -75,36 +70,11 @@ node_deserialize(
     cstring_def(&node->name);
     cstring_deserialize(&node->name, allocator, stream);
     binary_stream_read(
-      stream, (uint8_t *)&node->transform, 
-      sizeof(matrix4f), sizeof(matrix4f));
-
-    binary_stream_read(
-      stream, (uint8_t *)&node->meshes.count, 
-      sizeof(uint32_t), sizeof(uint32_t));
-
-    if (node->meshes.count) {
-      node->meshes.indices = (uint32_t *)allocator->mem_alloc(
-        sizeof(uint32_t) * node->meshes.count);
-      for (i = 0; i < node->meshes.count; ++i) {
-        binary_stream_read(
-          stream, (uint8_t *)&node->meshes.indices[i], 
-          sizeof(uint32_t), sizeof(uint32_t));
-      }
-    }
-
-    binary_stream_read(
-      stream, (uint8_t *)&node->nodes.count, 
-      sizeof(uint32_t), sizeof(uint32_t));
-
-    if (node->nodes.count) {
-      node->nodes.indices = (uint32_t *)allocator->mem_alloc(
-        sizeof(uint32_t) * node->nodes.count);
-      for (i = 0; i < node->nodes.count; ++i) {
-        binary_stream_read(
-          stream, (uint8_t *)&node->nodes.indices[i], 
-          sizeof(uint32_t), sizeof(uint32_t));
-      }
-    }
+      stream, (uint8_t *)&node->transform, sizeof(matrix4f), sizeof(matrix4f));
+    cvector_setup(&node->meshes, get_type_data(uint32_t), 0, allocator);
+    cvector_deserialize(&node->meshes, allocator, stream);
+    cvector_setup(&node->nodes, get_type_data(uint32_t), 0, allocator);
+    cvector_deserialize(&node->nodes, allocator, stream);
   }
 }
 
@@ -137,17 +107,8 @@ node_cleanup(
   {
     node_t *node = (node_t *)ptr;
     cstring_cleanup2(&node->name);
-
-    if (node->meshes.count) {
-      assert(node->meshes.indices);
-      allocator->mem_free(node->meshes.indices);
-    }
-
-    if (node->nodes.count) {
-      assert(node->nodes.indices);
-      allocator->mem_free(node->nodes.indices);
-    }
-
+    cvector_cleanup2(&node->meshes);
+    cvector_cleanup2(&node->nodes);
     node_def(node);
   }
 }

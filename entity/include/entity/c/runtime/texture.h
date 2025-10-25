@@ -12,6 +12,7 @@
 #define RUNTIME_IMAGE_H
 
 #include <stdint.h>
+#include <library/containers/cvector.h>
 #include <entity/c/mesh/texture.h>
 
 
@@ -33,8 +34,7 @@ struct texture_runtime_t {
   uint32_t width;
   uint32_t height;
   image_format_t format;
-  uint8_t* buffer;
-  size_t buffer_size;
+  cvector_t buffer;     // uint8_t
 } texture_runtime_t;
 
 typedef texture_runtime_t image_t;

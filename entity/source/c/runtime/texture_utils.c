@@ -51,33 +51,21 @@ free_texture_runtime_internal(
   const allocator_t* allocator)
 {
   assert(runtime && allocator);
-
-  // attempt to free the buffer.
-  if (runtime->buffer) {
-    assert(
-      runtime->buffer_size != 0 && 
-      "if buffer is non-null the size cannot be 0!");
-
-    allocator->mem_free(runtime->buffer);
-  }
-
+  cvector_cleanup2(&runtime->buffer);
   cstring_cleanup2(&runtime->texture.path);
 }
 
 void
 allocate_runtime_buffer(
-  texture_runtime_t* runtime, 
+  texture_runtime_t *runtime, 
   const size_t buffer_size, 
-  const allocator_t* allocator)
+  const allocator_t *allocator)
 {
-  assert(allocator && "allocator cannot be NULL");
-  assert(runtime && "image cannot be NULL");
-  assert(
-    runtime->buffer == NULL && runtime->buffer_size == 0 &&
-    "buffer is not emtpy!");
+  assert(allocator && runtime);
+  assert(cvector_is_def(&runtime->buffer));
   
-  runtime->buffer_size = buffer_size;
-  runtime->buffer = (uint8_t *)allocator->mem_alloc(buffer_size);
+  cvector_setup(&runtime->buffer, get_type_data(uint8_t), 0, allocator);
+  cvector_resize(&runtime->buffer, buffer_size);
 }
 
 void
@@ -85,17 +73,10 @@ free_runtime_buffer(
   texture_runtime_t* runtime, 
   const allocator_t* allocator)
 {
-  assert(runtime && "runtime cannot be NULL");
-  assert(
-    runtime->buffer != NULL && runtime->buffer_size != 0 &&
-    "attempting to free a NULL runtime buffer!");
-  assert(allocator && "allocator cannot be NULL");
-
-  // NOTE: The runtime might be reused/reloaded, so we reset the buffer
-  // variables.
-  allocator->mem_free(runtime->buffer);
-  runtime->buffer = NULL;
-  runtime->buffer_size = 0;
+  assert(runtime && allocator);
+  assert(!cvector_is_def(&runtime->buffer));
+  
+  cvector_cleanup2(&runtime->buffer);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

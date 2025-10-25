@@ -17,6 +17,7 @@ extern "C" {
 
 #include <stdint.h>
 #include <entity/c/internal/module.h>
+#include <library/containers/cvector.h>
 #include <library/string/cstring.h>
 #include <math/c/matrix4f.h>
 
@@ -50,19 +51,12 @@ extern "C" {
 typedef struct allocator_t allocator_t;
 typedef struct binary_stream_t binary_stream_t;
 
-// Indicies into the scene payloads.
-typedef
-struct payload_indices_t {
-  uint32_t count;
-  uint32_t *indices;
-} payload_indices_t;
-
 typedef
 struct node_t {
   cstring_t name;
   matrix4f transform;
-  payload_indices_t meshes;
-  payload_indices_t nodes;
+  cvector_t meshes;           // uint32_t
+  cvector_t nodes;            // uint32_t
 } node_t;
 
 ENTITY_API
