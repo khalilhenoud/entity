@@ -177,7 +177,6 @@ material_setup(
   assert(material && material_is_def(material));
   assert(name);
 
-  cstring_def(&material->name);
   cstring_setup(&material->name, name, allocator);
   material->ambient = ambient;
   material->diffuse = diffuse;

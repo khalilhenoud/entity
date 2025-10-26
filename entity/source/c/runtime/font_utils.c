@@ -28,10 +28,7 @@ create_font_runtime(
       (font_runtime_t*)allocator->mem_alloc(sizeof(font_runtime_t));
     memset(runtime, 0, sizeof(font_runtime_t));
 
-    cstring_def(&runtime->font.image_file);
     cstring_setup(&runtime->font.image_file, font->image_file.str, allocator);
-
-    cstring_def(&runtime->font.data_file);
     cstring_setup(&runtime->font.data_file, font->data_file.str, allocator);
 
     return runtime;

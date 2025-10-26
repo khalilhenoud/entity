@@ -29,9 +29,7 @@ create_texture_runtime(
       (texture_runtime_t*)allocator->mem_alloc(sizeof(texture_runtime_t));
     memset(runtime, 0, sizeof(texture_runtime_t));
     
-    cstring_def(&runtime->texture.path);
     cstring_setup(&runtime->texture.path, texture->path.str, allocator);
-
     return runtime;
   }
 }

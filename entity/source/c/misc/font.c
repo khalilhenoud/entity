@@ -120,10 +120,7 @@ font_setup(
     data_file && 
     "image file or data file are NULL!");
 
-  cstring_def(&font->image_file);
   cstring_setup(&font->image_file, image_file, allocator);
-
-  cstring_def(&font->data_file);
   cstring_setup(&font->data_file, data_file, allocator);
 }
 

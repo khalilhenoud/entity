@@ -111,7 +111,6 @@ texture_setup(
   assert(texture && texture_is_def(texture));
   assert(path);
 
-  cstring_def(&texture->path);
   cstring_setup(&texture->path, path, allocator);
 }
 
