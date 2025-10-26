@@ -71,9 +71,9 @@ node_deserialize(
     cstring_deserialize(&node->name, allocator, stream);
     binary_stream_read(
       stream, (uint8_t *)&node->transform, sizeof(matrix4f), sizeof(matrix4f));
-    cvector_setup(&node->meshes, get_type_data(uint32_t), 0, allocator);
+    cvector_def(&node->meshes);
     cvector_deserialize(&node->meshes, allocator, stream);
-    cvector_setup(&node->nodes, get_type_data(uint32_t), 0, allocator);
+    cvector_def(&node->nodes);
     cvector_deserialize(&node->nodes, allocator, stream);
   }
 }
