@@ -1,29 +1,29 @@
 /**
  * @file scene.c
  * @author khalilhenoud@gmail.com
- * @brief 
+ * @brief
  * @version 0.1
  * @date 2025-03-01
- * 
+ *
  * @copyright Copyright (c) 2025
- * 
+ *
  */
 #include <assert.h>
 #include <string.h>
-#include <library/core/core.h>
-#include <library/type_registry/type_registry.h>
-#include <library/allocator/allocator.h>
-#include <library/streams/binary_stream.h>
-#include <entity/c/scene/scene.h>
+#include <entity/c/mesh/material.h>
+#include <entity/c/mesh/mesh.h>
+#include <entity/c/mesh/mesh_utils.h>
+#include <entity/c/mesh/texture.h>
+#include <entity/c/misc/font.h>
 #include <entity/c/scene/camera.h>
 #include <entity/c/scene/light.h>
 #include <entity/c/scene/node.h>
-#include <entity/c/mesh/mesh.h>
-#include <entity/c/mesh/mesh_utils.h>
-#include <entity/c/mesh/material.h>
-#include <entity/c/mesh/texture.h>
-#include <entity/c/misc/font.h>
+#include <entity/c/scene/scene.h>
 #include <entity/c/spatial/bvh.h>
+#include <library/allocator/allocator.h>
+#include <library/core/core.h>
+#include <library/streams/binary_stream.h>
+#include <library/type_registry/type_registry.h>
 
 
 void
@@ -37,22 +37,22 @@ scene_def(void *ptr)
   }
 }
 
-uint32_t 
+uint32_t
 scene_is_def(const void *ptr)
 {
   assert(ptr);
 
   {
     const scene_t *scene = (const scene_t *)ptr;
-    scene_t def; 
+    scene_t def;
     scene_def(&def);
     return !memcmp(scene, &def, sizeof(scene_t));
   }
 }
 
-void 
+void
 scene_serialize(
-  const void *src, 
+  const void *src,
   binary_stream_t *stream)
 {
   assert(src && stream);
@@ -74,10 +74,10 @@ scene_serialize(
   }
 }
 
-void 
+void
 scene_deserialize(
-  void *dst, 
-  const allocator_t *allocator, 
+  void *dst,
+  const allocator_t *allocator,
   binary_stream_t *stream)
 {
   assert(dst && allocator && stream);
@@ -89,7 +89,7 @@ scene_deserialize(
     cstring_deserialize(&scene->name, allocator, stream);
 
     binary_stream_read(
-      stream, (uint8_t *)&scene->metadata, 
+      stream, (uint8_t *)&scene->metadata,
       sizeof(scene_metadata_t), sizeof(scene_metadata_t));
 
     cvector_deserialize(&scene->node_repo, allocator, stream);
@@ -103,13 +103,13 @@ scene_deserialize(
   }
 }
 
-size_t 
+size_t
 scene_type_size(void)
 {
   return sizeof(scene_t);
 }
 
-uint32_t 
+uint32_t
 scene_owns_alloc(void)
 {
   return 0;
@@ -121,9 +121,9 @@ scene_get_alloc(const void *ptr)
   return NULL;
 }
 
-void 
+void
 scene_cleanup(
-  void *ptr, 
+  void *ptr,
   const allocator_t *allocator)
 {
   assert(ptr && !scene_is_def(ptr));
@@ -147,7 +147,7 @@ scene_cleanup(
 ////////////////////////////////////////////////////////////////////////////////
 void
 scene_setup(
-  scene_t *scene, 
+  scene_t *scene,
   const char *name,
   const allocator_t* allocator)
 {
@@ -159,7 +159,7 @@ scene_setup(
 
 scene_t*
 scene_create(
-  const char *name, 
+  const char *name,
   const allocator_t *allocator)
 {
   assert(allocator);
@@ -174,7 +174,7 @@ scene_create(
 
 void
 scene_free(
-  scene_t *scene, 
+  scene_t *scene,
   const allocator_t* allocator)
 {
   assert(scene && allocator);

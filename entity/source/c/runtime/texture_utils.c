@@ -1,34 +1,34 @@
 /**
  * @file image_utils.c
  * @author khalilhenoud@gmail.com
- * @brief 
+ * @brief
  * @version 0.1
  * @date 2023-09-09
- * 
+ *
  * @copyright Copyright (c) 2023
- * 
+ *
  */
 #include <assert.h>
 #include <string.h>
-#include <library/allocator/allocator.h>
-#include <library/string/cstring.h>
 #include <entity/c/mesh/texture.h>
 #include <entity/c/runtime/texture.h>
 #include <entity/c/runtime/texture_utils.h>
+#include <library/allocator/allocator.h>
+#include <library/string/cstring.h>
 
 
 texture_runtime_t*
 create_texture_runtime(
-  const texture_t* texture, 
+  const texture_t* texture,
   const allocator_t* allocator)
 {
   assert(texture && allocator);
 
   {
-    texture_runtime_t* runtime = 
+    texture_runtime_t* runtime =
       (texture_runtime_t*)allocator->mem_alloc(sizeof(texture_runtime_t));
     memset(runtime, 0, sizeof(texture_runtime_t));
-    
+
     cstring_setup(&runtime->texture.path, texture->path.str, allocator);
     return runtime;
   }
@@ -36,7 +36,7 @@ create_texture_runtime(
 
 void
 free_texture_runtime(
-  texture_runtime_t* runtime, 
+  texture_runtime_t* runtime,
   const allocator_t* allocator)
 {
   free_texture_runtime_internal(runtime, allocator);
@@ -45,7 +45,7 @@ free_texture_runtime(
 
 void
 free_texture_runtime_internal(
-  texture_runtime_t* runtime, 
+  texture_runtime_t* runtime,
   const allocator_t* allocator)
 {
   assert(runtime && allocator);
@@ -55,25 +55,25 @@ free_texture_runtime_internal(
 
 void
 allocate_runtime_buffer(
-  texture_runtime_t *runtime, 
-  const size_t buffer_size, 
+  texture_runtime_t *runtime,
+  const size_t buffer_size,
   const allocator_t *allocator)
 {
   assert(allocator && runtime);
   assert(cvector_is_def(&runtime->buffer));
-  
+
   cvector_setup(&runtime->buffer, get_type_data(uint8_t), 0, allocator);
   cvector_resize(&runtime->buffer, buffer_size);
 }
 
 void
 free_runtime_buffer(
-  texture_runtime_t* runtime, 
+  texture_runtime_t* runtime,
   const allocator_t* allocator)
 {
   assert(runtime && allocator);
   assert(!cvector_is_def(&runtime->buffer));
-  
+
   cvector_cleanup2(&runtime->buffer);
 }
 

@@ -1,12 +1,12 @@
 /**
  * @file material.h
  * @author khalilhenoud@gmail.com
- * @brief 
+ * @brief
  * @version 0.1
  * @date 2023-09-04
- * 
+ *
  * @copyright Copyright (c) 2023
- * 
+ *
  */
 #ifndef SCENE_MATERIAL_H
 #define SCENE_MATERIAL_H
@@ -30,16 +30,16 @@ extern "C" {
 //|=============================================================================
 //|    *_def                    | YES
 //|    *_is_def                 | YES
-//|    *_replicate              | 
-//|    *_fullswap               | 
+//|    *_replicate              |
+//|    *_fullswap               |
 //|    *_serialize              | YES
 //|    *_deserialize            | YES
 //|    *_hash                   |
 //|    *_is_equal               |
 //|    *_type_size              | YES
 //|    *_type_alignment         |
-//|    *_type_id_count          | 
-//|    *_type_ids               | 
+//|    *_type_id_count          |
+//|    *_type_ids               |
 //|    *_owns_alloc             | YES
 //|    *_get_alloc              | YES
 //|    *_cleanup                | YES
@@ -81,28 +81,28 @@ void
 material_def(void *ptr);
 
 ENTITY_API
-uint32_t 
+uint32_t
 material_is_def(const void *ptr);
 
 ENTITY_API
-void 
+void
 material_serialize(
-  const void *src, 
+  const void *src,
   binary_stream_t *stream);
 
 ENTITY_API
-void 
+void
 material_deserialize(
-  void *dst, 
-  const allocator_t *allocator, 
+  void *dst,
+  const allocator_t *allocator,
   binary_stream_t* stream);
 
 ENTITY_API
-size_t 
+size_t
 material_type_size(void);
 
 ENTITY_API
-uint32_t 
+uint32_t
 material_owns_alloc(void);
 
 ENTITY_API
@@ -110,17 +110,17 @@ const allocator_t *
 material_get_alloc(const void *ptr);
 
 ENTITY_API
-void 
+void
 material_cleanup(
-  void *ptr, 
+  void *ptr,
   const allocator_t* allocator);
 
 ////////////////////////////////////////////////////////////////////////////////
 ENTITY_API
 void
 material_setup(
-  material_t *material, 
-  const char *name, 
+  material_t *material,
+  const char *name,
   color_rgba_t ambient,
   color_rgba_t diffuse,
   color_rgba_t specular,

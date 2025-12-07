@@ -1,19 +1,19 @@
 /**
  * @file light.c
  * @author khalilhenoud@gmail.com
- * @brief 
+ * @brief
  * @version 0.1
  * @date 2025-02-23
- * 
+ *
  * @copyright Copyright (c) 2025
- * 
+ *
  */
 #include <assert.h>
 #include <string.h>
+#include <entity/c/scene/light.h>
+#include <library/allocator/allocator.h>
 #include <library/core/core.h>
 #include <library/type_registry/type_registry.h>
-#include <library/allocator/allocator.h>
-#include <entity/c/scene/light.h>
 
 
 void
@@ -27,22 +27,22 @@ light_def(void *ptr)
   }
 }
 
-uint32_t 
+uint32_t
 light_is_def(const void *ptr)
 {
   assert(ptr);
 
   {
     const light_t *light = (const light_t *)ptr;
-    light_t def; 
+    light_t def;
     light_def(&def);
     return !memcmp(light, &def, sizeof(light_t));
   }
 }
 
-void 
+void
 light_serialize(
-  const void *src, 
+  const void *src,
   binary_stream_t *stream)
 {
   assert(src && stream);
@@ -65,10 +65,10 @@ light_serialize(
   }
 }
 
-void 
+void
 light_deserialize(
-  void *dst, 
-  const allocator_t *allocator, 
+  void *dst,
+  const allocator_t *allocator,
   binary_stream_t *stream)
 {
   assert(dst && allocator && stream);
@@ -77,40 +77,40 @@ light_deserialize(
     light_t *light = (light_t *)dst;
     cstring_def(&light->name);
     cstring_deserialize(&light->name, allocator, stream);
-    binary_stream_read(stream, 
+    binary_stream_read(stream,
       (uint8_t *)&light->position, sizeof(vector3f), sizeof(vector3f));
-    binary_stream_read(stream, 
+    binary_stream_read(stream,
       (uint8_t *)&light->direction, sizeof(vector3f), sizeof(vector3f));
-    binary_stream_read(stream, 
+    binary_stream_read(stream,
       (uint8_t *)&light->up, sizeof(vector3f), sizeof(vector3f));
-    binary_stream_read(stream, 
+    binary_stream_read(stream,
       (uint8_t *)&light->inner_cone, sizeof(float), sizeof(float));
-    binary_stream_read(stream, 
+    binary_stream_read(stream,
       (uint8_t *)&light->outer_cone, sizeof(float), sizeof(float));
-    binary_stream_read(stream, 
+    binary_stream_read(stream,
       (uint8_t *)&light->attenuation_constant, sizeof(float), sizeof(float));
-    binary_stream_read(stream, 
+    binary_stream_read(stream,
       (uint8_t *)&light->attenuation_linear, sizeof(float), sizeof(float));
-    binary_stream_read(stream, 
+    binary_stream_read(stream,
       (uint8_t *)&light->attenuation_quadratic, sizeof(float), sizeof(float));
-    binary_stream_read(stream, 
+    binary_stream_read(stream,
       (uint8_t *)&light->diffuse, sizeof(color_rgba_t), sizeof(color_rgba_t));
-    binary_stream_read(stream, 
+    binary_stream_read(stream,
       (uint8_t *)&light->specular, sizeof(color_rgba_t), sizeof(color_rgba_t));
-    binary_stream_read(stream, 
+    binary_stream_read(stream,
       (uint8_t *)&light->ambient, sizeof(color_rgba_t), sizeof(color_rgba_t));
-    binary_stream_read(stream, 
+    binary_stream_read(stream,
       (uint8_t *)&light->type, sizeof(light_type_t), sizeof(light_type_t));
   }
 }
 
-size_t 
+size_t
 light_type_size(void)
 {
   return sizeof(light_t);
 }
 
-uint32_t 
+uint32_t
 light_owns_alloc(void)
 {
   return 0;
@@ -122,9 +122,9 @@ light_get_alloc(const void *ptr)
   return NULL;
 }
 
-void 
+void
 light_cleanup(
-  void *ptr, 
+  void *ptr,
   const allocator_t *allocator)
 {
   assert(ptr && !light_is_def(ptr));
@@ -139,8 +139,8 @@ light_cleanup(
 ////////////////////////////////////////////////////////////////////////////////
 void
 light_setup(
-  light_t *light, 
-  const char *name, 
+  light_t *light,
+  const char *name,
   vector3f position,
   vector3f direction,
   vector3f up,

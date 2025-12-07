@@ -1,12 +1,12 @@
 /**
  * @file texture_utils.h
  * @author khalilhenoud@gmail.com
- * @brief 
+ * @brief
  * @version 0.1
  * @date 2023-09-09
- * 
+ *
  * @copyright Copyright (c) 2023
- * 
+ *
  */
 #ifndef RUNTIME_IMAGE_UTILS_H
 #define RUNTIME_IMAGE_UTILS_H
@@ -27,32 +27,32 @@ typedef struct allocator_t allocator_t;
 ENTITY_API
 texture_runtime_t*
 create_texture_runtime(
-  const texture_t* texture, 
+  const texture_t* texture,
   const allocator_t* allocator);
 
 ENTITY_API
 void
 free_texture_runtime(
-  texture_runtime_t* texture_runtime, 
+  texture_runtime_t* texture_runtime,
   const allocator_t* allocator);
 
 ENTITY_API
 void
 free_texture_runtime_internal(
-  texture_runtime_t* texture_runtime, 
+  texture_runtime_t* texture_runtime,
   const allocator_t* allocator);
 
 ENTITY_API
 void
 allocate_runtime_buffer(
-  texture_runtime_t* texture_runtime, 
-  const size_t buffer_size, 
+  texture_runtime_t* texture_runtime,
+  const size_t buffer_size,
   const allocator_t* allocator);
 
 ENTITY_API
 void
 free_runtime_buffer(
-  texture_runtime_t* texture_runtime, 
+  texture_runtime_t* texture_runtime,
   const allocator_t* allocator);
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -1,22 +1,22 @@
 /**
  * @file bvh.c
  * @author khalilhenoud@gmail.com
- * @brief 
+ * @brief
  * @version 0.1
  * @date 2025-03-01
- * 
+ *
  * @copyright Copyright (c) 2025
- * 
+ *
  */
 #include <assert.h>
-#include <string.h>
-#include <math.h>
 #include <limits.h>
-#include <math/c/face.h>
+#include <math.h>
+#include <string.h>
+#include <entity/c/spatial/bvh.h>
+#include <library/allocator/allocator.h>
 #include <library/core/core.h>
 #include <library/type_registry/type_registry.h>
-#include <library/allocator/allocator.h>
-#include <entity/c/spatial/bvh.h>
+#include <math/c/face.h>
 
 #define BVH_PRIMITIVES_PER_LEAF 8
 
@@ -32,22 +32,22 @@ bvh_def(void *ptr)
   }
 }
 
-uint32_t 
+uint32_t
 bvh_is_def(const void *ptr)
 {
   assert(ptr);
 
   {
     const bvh_t *bvh = (const bvh_t *)ptr;
-    bvh_t def; 
+    bvh_t def;
     bvh_def(&def);
     return !memcmp(bvh, &def, sizeof(bvh_t));
   }
 }
 
-void 
+void
 bvh_serialize(
-  const void *src, 
+  const void *src,
   binary_stream_t *stream)
 {
   assert(src && stream);
@@ -62,10 +62,10 @@ bvh_serialize(
   }
 }
 
-void 
+void
 bvh_deserialize(
-  void *dst, 
-  const allocator_t *allocator, 
+  void *dst,
+  const allocator_t *allocator,
   binary_stream_t *stream)
 {
   assert(dst && allocator && stream);
@@ -81,13 +81,13 @@ bvh_deserialize(
   }
 }
 
-size_t 
+size_t
 bvh_type_size(void)
 {
   return sizeof(bvh_t);
 }
 
-uint32_t 
+uint32_t
 bvh_owns_alloc(void)
 {
   return 0;
@@ -99,9 +99,9 @@ bvh_get_alloc(const void *ptr)
   return NULL;
 }
 
-void 
+void
 bvh_cleanup(
-  void *ptr, 
+  void *ptr,
   const allocator_t *allocator)
 {
   assert(ptr && !bvh_is_def(ptr));
@@ -129,20 +129,20 @@ swap_faces(bvh_t *bvh, uint32_t left, uint32_t right);
 void
 get_subdivision_plane_naive(
   bvh_t *bvh,
-  bvh_node_t *node, 
+  bvh_node_t *node,
   uint32_t first_prim,
   uint32_t last_prim_excl,
   point3f *center,
   uint32_t *axis);
-  
+
 void
 subdivide_naive(
-  bvh_t *bvh, 
-  uint32_t first_prim, 
-  uint32_t last_prim_excl, 
+  bvh_t *bvh,
+  uint32_t first_prim,
+  uint32_t last_prim_excl,
   uint32_t index,
   uint32_t *nodes_used);
-  
+
 void
 construct_bvh_naive(bvh_t *bvh, const allocator_t *allocator);
 
@@ -151,17 +151,17 @@ is_leaf(const bvh_node_t *node);
 
 void
 query_intersection_fixed_256_internal(
-  bvh_t *bvh, 
+  bvh_t *bvh,
   uint32_t node_index,
-  bvh_aabb_t *bounds, 
-  uint32_t array[256], 
+  bvh_aabb_t *bounds,
+  uint32_t array[256],
   uint32_t *used);
 
 bvh_t*
 bvh_create(
-  float **vertices, 
-  uint32_t **indices, 
-  uint32_t *indices_count, 
+  float **vertices,
+  uint32_t **indices,
+  uint32_t *indices_count,
   uint32_t multi_count,
   const allocator_t *allocator,
   bvh_construction_method_t method)
@@ -236,7 +236,7 @@ bvh_create(
               equal_to_v3f(face->points + 0, face->points + 1) ||
               equal_to_v3f(face->points + 0, face->points + 2) ||
               equal_to_v3f(face->points + 1, face->points + 2));
-            
+
             if (!is_valid) {
               swap_faces(bvh, face_index, bvh->faces.size - 1);
               cvector_pop_back(&bvh->faces);
@@ -274,8 +274,8 @@ get_bvh_primitives_per_leaf(void)
 
 void
 merge_aabb(
-  bvh_aabb_t *dst, 
-  const bvh_aabb_t *a, 
+  bvh_aabb_t *dst,
+  const bvh_aabb_t *a,
   const bvh_aabb_t *b)
 {
   dst->min_max[0].data[0] = fmin(a->min_max[0].data[0], b->min_max[0].data[0]);
@@ -289,7 +289,7 @@ merge_aabb(
 
 void
 merge_aabb_inplace(
-  bvh_aabb_t *dst, 
+  bvh_aabb_t *dst,
   const bvh_aabb_t *b)
 {
   bvh_aabb_t a = *dst;
@@ -365,10 +365,10 @@ static
 void
 get_subdivision_plane_naive(
   bvh_t *bvh,
-  bvh_node_t *node, 
+  bvh_node_t *node,
   uint32_t first_prim,
   uint32_t last_prim_excl,
-  point3f *center, 
+  point3f *center,
   uint32_t *axis)
 {
   int32_t left[] = { 0, 0, 0 }, right[] = { 0, 0, 0 };
@@ -398,12 +398,12 @@ get_subdivision_plane_naive(
   assert(quota != INT32_MAX);
 }
 
-static 
+static
 void
 subdivide_naive(
-  bvh_t *bvh, 
-  uint32_t first_prim, 
-  uint32_t last_prim_excl, 
+  bvh_t *bvh,
+  uint32_t first_prim,
+  uint32_t last_prim_excl,
   uint32_t index,
   uint32_t *nodes_used)
 {
@@ -429,7 +429,7 @@ subdivide_naive(
       node->tri_count = last_prim_excl - first_prim;
       return;
     }
-      
+
     get_subdivision_plane_naive(
       bvh, node, first_prim, last_prim_excl, &center, &axis);
 
@@ -454,7 +454,7 @@ subdivide_naive(
         node->tri_count = last_prim_excl - first_prim;
         return;
       }
-      
+
       // we are dealing with an interior node.
       node->tri_count = 0;
       node->left_first = *nodes_used;
@@ -482,13 +482,13 @@ construct_bvh_naive(bvh_t *bvh, const allocator_t *allocator)
 int32_t
 bounds_intersect(const bvh_aabb_t *left, const bvh_aabb_t *right)
 {
-  int32_t no_intersect_x = 
+  int32_t no_intersect_x =
     left->min_max[0].data[0] > right->min_max[1].data[0] ||
     left->min_max[1].data[0] < right->min_max[0].data[0];
-  int32_t no_intersect_y = 
+  int32_t no_intersect_y =
     left->min_max[0].data[1] > right->min_max[1].data[1] ||
     left->min_max[1].data[1] < right->min_max[0].data[1];
-  int32_t no_intersect_z = 
+  int32_t no_intersect_z =
     left->min_max[0].data[2] > right->min_max[1].data[2] ||
     left->min_max[1].data[2] < right->min_max[0].data[2];
   return !(no_intersect_x || no_intersect_y || no_intersect_z);
@@ -504,10 +504,10 @@ is_leaf(const bvh_node_t *node)
 static
 void
 query_intersection_fixed_256_internal(
-  bvh_t *bvh, 
+  bvh_t *bvh,
   uint32_t node_index,
-  bvh_aabb_t *bounds, 
-  uint32_t array[256], 
+  bvh_aabb_t *bounds,
+  uint32_t array[256],
   uint32_t *used)
 {
   bvh_node_t* node = cvector_as(&bvh->nodes, node_index, bvh_node_t);
@@ -519,7 +519,7 @@ query_intersection_fixed_256_internal(
 
   if (!bounds_intersect(&node->bounds, bounds))
     return;
-  
+
   query_intersection_fixed_256_internal(
     bvh, node->left_first + 0, bounds, array, used);
   query_intersection_fixed_256_internal(
@@ -528,9 +528,9 @@ query_intersection_fixed_256_internal(
 
 void
 query_intersection_fixed_256(
-  bvh_t *bvh, 
-  bvh_aabb_t *bounds, 
-  uint32_t array[256], 
+  bvh_t *bvh,
+  bvh_aabb_t *bounds,
+  uint32_t array[256],
   uint32_t *used)
 {
   assert(bvh && bounds && array && used);

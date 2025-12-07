@@ -1,19 +1,19 @@
 /**
  * @file node.c
  * @author khalilhenoud@gmail.com
- * @brief 
+ * @brief
  * @version 0.1
  * @date 2025-03-01
- * 
+ *
  * @copyright Copyright (c) 2025
- * 
+ *
  */
 #include <assert.h>
 #include <string.h>
+#include <entity/c/scene/node.h>
+#include <library/allocator/allocator.h>
 #include <library/core/core.h>
 #include <library/type_registry/type_registry.h>
-#include <library/allocator/allocator.h>
-#include <entity/c/scene/node.h>
 
 
 void
@@ -27,22 +27,22 @@ node_def(void *ptr)
   }
 }
 
-uint32_t 
+uint32_t
 node_is_def(const void *ptr)
 {
   assert(ptr);
 
   {
     const node_t *node = (const node_t *)ptr;
-    node_t def; 
+    node_t def;
     node_def(&def);
     return !memcmp(node, &def, sizeof(node_t));
   }
 }
 
-void 
+void
 node_serialize(
-  const void *src, 
+  const void *src,
   binary_stream_t *stream)
 {
   assert(src && stream);
@@ -56,10 +56,10 @@ node_serialize(
   }
 }
 
-void 
+void
 node_deserialize(
-  void *dst, 
-  const allocator_t *allocator, 
+  void *dst,
+  const allocator_t *allocator,
   binary_stream_t *stream)
 {
   assert(dst && allocator && stream);
@@ -78,13 +78,13 @@ node_deserialize(
   }
 }
 
-size_t 
+size_t
 node_type_size(void)
 {
   return sizeof(node_t);
 }
 
-uint32_t 
+uint32_t
 node_owns_alloc(void)
 {
   return 0;
@@ -96,9 +96,9 @@ node_get_alloc(const void *ptr)
   return NULL;
 }
 
-void 
+void
 node_cleanup(
-  void *ptr, 
+  void *ptr,
   const allocator_t *allocator)
 {
   assert(ptr && !node_is_def(ptr));

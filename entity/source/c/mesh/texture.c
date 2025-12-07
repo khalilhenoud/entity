@@ -1,19 +1,19 @@
 /**
  * @file texture.c
  * @author khalilhenoud@gmail.com
- * @brief 
+ * @brief
  * @version 0.1
  * @date 2025-02-23
- * 
+ *
  * @copyright Copyright (c) 2025
- * 
+ *
  */
 #include <assert.h>
 #include <string.h>
+#include <entity/c/mesh/texture.h>
+#include <library/allocator/allocator.h>
 #include <library/core/core.h>
 #include <library/type_registry/type_registry.h>
-#include <library/allocator/allocator.h>
-#include <entity/c/mesh/texture.h>
 
 
 void
@@ -27,22 +27,22 @@ texture_def(void *ptr)
   }
 }
 
-uint32_t 
+uint32_t
 texture_is_def(const void *ptr)
 {
   assert(ptr);
 
   {
     const texture_t *texture = (const texture_t *)ptr;
-    texture_t def; 
+    texture_t def;
     texture_def(&def);
     return !memcmp(texture, &def, sizeof(texture_t));
   }
 }
 
-void 
+void
 texture_serialize(
-  const void *src, 
+  const void *src,
   binary_stream_t *stream)
 {
   assert(src && stream);
@@ -53,10 +53,10 @@ texture_serialize(
   }
 }
 
-void 
+void
 texture_deserialize(
-  void *dst, 
-  const allocator_t *allocator, 
+  void *dst,
+  const allocator_t *allocator,
   binary_stream_t *stream)
 {
   assert(dst && allocator && stream);
@@ -68,13 +68,13 @@ texture_deserialize(
   }
 }
 
-size_t 
+size_t
 texture_type_size(void)
 {
   return sizeof(texture_t);
 }
 
-uint32_t 
+uint32_t
 texture_owns_alloc(void)
 {
   return 0;
@@ -86,9 +86,9 @@ texture_get_alloc(const void *ptr)
   return NULL;
 }
 
-void 
+void
 texture_cleanup(
-  void *ptr, 
+  void *ptr,
   const allocator_t *allocator)
 {
   assert(ptr && !texture_is_def(ptr));
@@ -103,8 +103,8 @@ texture_cleanup(
 ////////////////////////////////////////////////////////////////////////////////
 void
 texture_setup(
-  texture_t *texture, 
-  const char *path, 
+  texture_t *texture,
+  const char *path,
   const allocator_t* allocator)
 {
   assert(allocator);

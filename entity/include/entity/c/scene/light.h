@@ -1,12 +1,12 @@
 /**
  * @file light.h
  * @author khalilhenoud@gmail.com
- * @brief 
+ * @brief
  * @version 0.1
  * @date 2024-01-20
- * 
+ *
  * @copyright Copyright (c) 2024
- * 
+ *
  */
 #ifndef SCENE_LIGHT_H
 #define SCENE_LIGHT_H
@@ -29,16 +29,16 @@ extern "C" {
 //|=============================================================================
 //|    *_def                    | YES
 //|    *_is_def                 | YES
-//|    *_replicate              | 
-//|    *_fullswap               | 
+//|    *_replicate              |
+//|    *_fullswap               |
 //|    *_serialize              | YES
 //|    *_deserialize            | YES
 //|    *_hash                   |
 //|    *_is_equal               |
 //|    *_type_size              | YES
 //|    *_type_alignment         |
-//|    *_type_id_count          | 
-//|    *_type_ids               | 
+//|    *_type_id_count          |
+//|    *_type_ids               |
 //|    *_owns_alloc             | YES
 //|    *_get_alloc              | YES
 //|    *_cleanup                | YES
@@ -58,7 +58,7 @@ enum light_type_t {
   LIGHT_TYPE_COUNT
 } light_type_t;
 
-// NOTE: 
+// NOTE:
 //  - lights are relative to their scene space.
 //  - direction/up/cone not applicable to point lights.
 //  - cones are not applicable to point/directional lights.
@@ -86,28 +86,28 @@ void
 light_def(void *ptr);
 
 ENTITY_API
-uint32_t 
+uint32_t
 light_is_def(const void *ptr);
 
 ENTITY_API
-void 
+void
 light_serialize(
-  const void *src, 
+  const void *src,
   binary_stream_t *stream);
 
 ENTITY_API
-void 
+void
 light_deserialize(
-  void *dst, 
-  const allocator_t *allocator, 
+  void *dst,
+  const allocator_t *allocator,
   binary_stream_t* stream);
 
 ENTITY_API
-size_t 
+size_t
 light_type_size(void);
 
 ENTITY_API
-uint32_t 
+uint32_t
 light_owns_alloc(void);
 
 ENTITY_API
@@ -115,17 +115,17 @@ const allocator_t *
 light_get_alloc(const void *ptr);
 
 ENTITY_API
-void 
+void
 light_cleanup(
-  void *ptr, 
+  void *ptr,
   const allocator_t* allocator);
 
 ////////////////////////////////////////////////////////////////////////////////
 ENTITY_API
 void
 light_setup(
-  light_t *light, 
-  const char *name, 
+  light_t *light,
+  const char *name,
   vector3f position,
   vector3f direction,
   vector3f up,

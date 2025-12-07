@@ -1,12 +1,12 @@
 /**
  * @file color.h
  * @author khalilhenoud@gmail.com
- * @brief 
+ * @brief
  * @version 0.1
  * @date 2023-09-04
- * 
+ *
  * @copyright Copyright (c) 2023
- * 
+ *
  */
 #ifndef SCENE_COLOR_H
 #define SCENE_COLOR_H

@@ -1,22 +1,22 @@
 /**
  * @file mesh.c
  * @author khalilhenoud@gmail.com
- * @brief 
+ * @brief
  * @version 0.1
  * @date 2025-02-25
- * 
+ *
  * @copyright Copyright (c) 2025
- * 
+ *
  */
 #include <assert.h>
 #include <string.h>
-#include <library/core/core.h>
-#include <library/type_registry/type_registry.h>
+#include <entity/c/mesh/mesh.h>
 #include <library/allocator/allocator.h>
+#include <library/core/core.h>
 #include <library/streams/binary_stream.h>
+#include <library/type_registry/type_registry.h>
 #include <math/c/common.h>
 #include <math/c/matrix4f.h>
-#include <entity/c/mesh/mesh.h>
 
 
 void
@@ -30,22 +30,22 @@ mesh_def(void *ptr)
   }
 }
 
-uint32_t 
+uint32_t
 mesh_is_def(const void *ptr)
 {
   assert(ptr);
 
   {
     const mesh_t *mesh = (const mesh_t *)ptr;
-    mesh_t def; 
+    mesh_t def;
     mesh_def(&def);
     return !memcmp(mesh, &def, sizeof(mesh_t));
   }
 }
 
-void 
+void
 mesh_serialize(
-  const void *src, 
+  const void *src,
   binary_stream_t *stream)
 {
   assert(src && stream);
@@ -61,10 +61,10 @@ mesh_serialize(
   }
 }
 
-void 
+void
 mesh_deserialize(
-  void *dst, 
-  const allocator_t *allocator, 
+  void *dst,
+  const allocator_t *allocator,
   binary_stream_t *stream)
 {
   assert(dst && allocator && stream);
@@ -80,19 +80,19 @@ mesh_deserialize(
     cvector_def(&mesh->indices);
     cvector_deserialize(&mesh->indices, allocator, stream);
     binary_stream_read(
-      stream, (uint8_t *)mesh->materials.indices, 
-      sizeof(uint32_t) * MAX_MATERIAL_NUMBER, 
+      stream, (uint8_t *)mesh->materials.indices,
+      sizeof(uint32_t) * MAX_MATERIAL_NUMBER,
       sizeof(uint32_t) * MAX_MATERIAL_NUMBER);
   }
 }
 
-size_t 
+size_t
 mesh_type_size(void)
 {
   return sizeof(mesh_t);
 }
 
-uint32_t 
+uint32_t
 mesh_owns_alloc(void)
 {
   return 0;
@@ -104,9 +104,9 @@ mesh_get_alloc(const void *ptr)
   return NULL;
 }
 
-void 
+void
 mesh_cleanup(
-  void *ptr, 
+  void *ptr,
   const allocator_t *allocator)
 {
   assert(ptr && !mesh_is_def(ptr));
@@ -142,11 +142,11 @@ mesh_setup(
   {
     size_t vtotal = sizeof(float) * vertices_count * 3;
     size_t itotal = sizeof(uint32_t) * indices_count;
-    
+
     cvector_setup(&mesh->vertices, get_type_data(float), 0, allocator);
     cvector_resize(&mesh->vertices, vertices_count * 3);
     memcpy(mesh->vertices.data, vertices, vtotal);
-    
+
     cvector_setup(&mesh->normals, get_type_data(float), 0, allocator);
     cvector_resize(&mesh->normals, vertices_count * 3);
     memcpy(mesh->normals.data, normals, vtotal);
@@ -154,7 +154,7 @@ mesh_setup(
     cvector_setup(&mesh->uvs, get_type_data(float), 0, allocator);
     cvector_resize(&mesh->uvs, vertices_count * 3);
     memcpy(mesh->uvs.data, uvs, vtotal);
-    
+
     cvector_setup(&mesh->indices, get_type_data(uint32_t), 0, allocator);
     cvector_resize(&mesh->indices, indices_count);
     memcpy(mesh->indices.data, indices, itotal);

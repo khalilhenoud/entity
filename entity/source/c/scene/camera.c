@@ -1,20 +1,20 @@
 /**
  * @file camera.c
  * @author khalilhenoud@gmail.com
- * @brief 
+ * @brief
  * @version 0.1
  * @date 2025-02-28
- * 
+ *
  * @copyright Copyright (c) 2025
- * 
+ *
  */
 #include <assert.h>
 #include <string.h>
-#include <math/c/matrix4f.h>
+#include <entity/c/scene/camera.h>
+#include <library/allocator/allocator.h>
 #include <library/core/core.h>
 #include <library/type_registry/type_registry.h>
-#include <library/allocator/allocator.h>
-#include <entity/c/scene/camera.h>
+#include <math/c/matrix4f.h>
 
 
 void
@@ -28,22 +28,22 @@ camera_def(void *ptr)
   }
 }
 
-uint32_t 
+uint32_t
 camera_is_def(const void *ptr)
 {
   assert(ptr);
 
   {
     const camera_t *camera = (const camera_t *)ptr;
-    camera_t def; 
+    camera_t def;
     camera_def(&def);
     return !memcmp(camera, &def, sizeof(camera_t));
   }
 }
 
-void 
+void
 camera_serialize(
-  const void *src, 
+  const void *src,
   binary_stream_t *stream)
 {
   assert(src && stream);
@@ -56,10 +56,10 @@ camera_serialize(
   }
 }
 
-void 
+void
 camera_deserialize(
-  void *dst, 
-  const allocator_t *allocator, 
+  void *dst,
+  const allocator_t *allocator,
   binary_stream_t *stream)
 {
   assert(dst && allocator && stream);
@@ -73,7 +73,7 @@ camera_deserialize(
   }
 }
 
-size_t 
+size_t
 camera_type_size(void)
 {
   return sizeof(camera_t);
@@ -82,9 +82,9 @@ camera_type_size(void)
 ////////////////////////////////////////////////////////////////////////////////
 void
 camera_setup(
-  camera_t *camera, 
-  const vector3f position, 
-  const vector3f lookat, 
+  camera_t *camera,
+  const vector3f position,
+  const vector3f lookat,
   const vector3f upvector)
 {
   assert(camera && camera_is_def(camera));
@@ -95,7 +95,7 @@ camera_t*
 camera_create(const allocator_t* allocator)
 {
   assert(allocator);
-  
+
   {
     camera_t* camera = (camera_t*)allocator->mem_alloc(sizeof(camera_t));
     camera_def(camera);
@@ -105,7 +105,7 @@ camera_create(const allocator_t* allocator)
 
 void
 camera_free(
-  camera_t* camera, 
+  camera_t* camera,
   const allocator_t* allocator)
 {
   assert(camera && allocator);
@@ -114,9 +114,9 @@ camera_free(
 
 void
 camera_set_lookat(
-  camera_t *camera, 
-  const vector3f position, 
-  const vector3f lookat, 
+  camera_t *camera,
+  const vector3f position,
+  const vector3f lookat,
   const vector3f upvector)
 {
   assert(camera);
@@ -130,7 +130,7 @@ camera_set_lookat(
 
 void
 camera_view_matrix(
-  const camera_t *camera, 
+  const camera_t *camera,
   matrix4f *out)
 {
   assert(camera && out);
@@ -142,9 +142,9 @@ camera_view_matrix(
     vector3f tmp, result;
     matrix4f_set_identity(&camera_rotation);
     matrix4f_translation(
-      &translation, 
-      -camera->position.data[0], 
-      -camera->position.data[1], 
+      &translation,
+      -camera->position.data[0],
+      -camera->position.data[1],
       -camera->position.data[2]);
     matrix4f_cross_product(&cross_product, &camera->up_vector);
     tmp = camera->lookat_direction;

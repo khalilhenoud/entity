@@ -1,19 +1,19 @@
 /**
  * @file material.c
  * @author khalilhenoud@gmail.com
- * @brief 
+ * @brief
  * @version 0.1
  * @date 2025-02-23
- * 
+ *
  * @copyright Copyright (c) 2025
- * 
+ *
  */
 #include <assert.h>
 #include <string.h>
+#include <entity/c/mesh/material.h>
+#include <library/allocator/allocator.h>
 #include <library/core/core.h>
 #include <library/type_registry/type_registry.h>
-#include <library/allocator/allocator.h>
-#include <entity/c/mesh/material.h>
 
 
 void
@@ -27,22 +27,22 @@ material_def(void *ptr)
   }
 }
 
-uint32_t 
+uint32_t
 material_is_def(const void *ptr)
 {
   assert(ptr);
 
   {
     const material_t *material = (const material_t *)ptr;
-    material_t def; 
+    material_t def;
     material_def(&def);
     return !memcmp(material, &def, sizeof(material_t));
   }
 }
 
-void 
+void
 material_serialize(
-  const void *src, 
+  const void *src,
   binary_stream_t *stream)
 {
   assert(src && stream);
@@ -71,10 +71,10 @@ material_serialize(
   }
 }
 
-void 
+void
 material_deserialize(
-  void *dst, 
-  const allocator_t *allocator, 
+  void *dst,
+  const allocator_t *allocator,
   binary_stream_t *stream)
 {
   assert(dst && allocator && stream);
@@ -84,57 +84,57 @@ material_deserialize(
     cstring_def(&material->name);
     cstring_deserialize(&material->name, allocator, stream);
     binary_stream_read(
-      stream, (uint8_t *)&material->ambient, 
+      stream, (uint8_t *)&material->ambient,
       sizeof(color_rgba_t), sizeof(color_rgba_t));
     binary_stream_read(
-      stream, (uint8_t *)&material->diffuse, 
+      stream, (uint8_t *)&material->diffuse,
       sizeof(color_rgba_t), sizeof(color_rgba_t));
     binary_stream_read(
-      stream, (uint8_t *)&material->specular, 
+      stream, (uint8_t *)&material->specular,
       sizeof(color_rgba_t), sizeof(color_rgba_t));
     binary_stream_read(
-      stream, (uint8_t *)&material->shininess, 
+      stream, (uint8_t *)&material->shininess,
       sizeof(float), sizeof(float));
     binary_stream_read(
-      stream, (uint8_t *)&material->opacity, 
+      stream, (uint8_t *)&material->opacity,
       sizeof(float), sizeof(float));
     binary_stream_read(
-      stream, (uint8_t *)&material->textures.used, 
+      stream, (uint8_t *)&material->textures.used,
       sizeof(uint32_t), sizeof(uint32_t));
     {
       uint32_t i = 0;
       for (; i < material->textures.used; ++i) {
         texture_properties_t *prop = material->textures.data + i;
         binary_stream_read(
-          stream, (uint8_t *)&prop->index, 
+          stream, (uint8_t *)&prop->index,
           sizeof(uint32_t), sizeof(uint32_t));
         binary_stream_read(
-          stream, (uint8_t *)&prop->u, 
+          stream, (uint8_t *)&prop->u,
           sizeof(float), sizeof(float));
         binary_stream_read(
-          stream, (uint8_t *)&prop->v, 
+          stream, (uint8_t *)&prop->v,
           sizeof(float), sizeof(float));
         binary_stream_read(
-          stream, (uint8_t *)&prop->u_scale, 
+          stream, (uint8_t *)&prop->u_scale,
           sizeof(float), sizeof(float));
         binary_stream_read(
-          stream, (uint8_t *)&prop->v_scale, 
+          stream, (uint8_t *)&prop->v_scale,
           sizeof(float), sizeof(float));
         binary_stream_read(
-          stream, (uint8_t *)&prop->angle, 
+          stream, (uint8_t *)&prop->angle,
           sizeof(float), sizeof(float));
       }
     }
   }
 }
 
-size_t 
+size_t
 material_type_size(void)
 {
   return sizeof(material_t);
 }
 
-uint32_t 
+uint32_t
 material_owns_alloc(void)
 {
   return 0;
@@ -146,9 +146,9 @@ material_get_alloc(const void *ptr)
   return NULL;
 }
 
-void 
+void
 material_cleanup(
-  void *ptr, 
+  void *ptr,
   const allocator_t *allocator)
 {
   assert(ptr && !material_is_def(ptr));
@@ -163,8 +163,8 @@ material_cleanup(
 ////////////////////////////////////////////////////////////////////////////////
 void
 material_setup(
-  material_t *material, 
-  const char *name, 
+  material_t *material,
+  const char *name,
   color_rgba_t ambient,
   color_rgba_t diffuse,
   color_rgba_t specular,

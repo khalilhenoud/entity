@@ -1,19 +1,19 @@
 /**
  * @file font.c
  * @author khalilhenoud@gmail.com
- * @brief 
+ * @brief
  * @version 0.1
  * @date 2025-02-22
- * 
+ *
  * @copyright Copyright (c) 2025
- * 
+ *
  */
 #include <assert.h>
 #include <string.h>
+#include <entity/c/misc/font.h>
+#include <library/allocator/allocator.h>
 #include <library/core/core.h>
 #include <library/type_registry/type_registry.h>
-#include <library/allocator/allocator.h>
-#include <entity/c/misc/font.h>
 
 
 void
@@ -27,22 +27,22 @@ font_def(void *ptr)
   }
 }
 
-uint32_t 
+uint32_t
 font_is_def(const void *ptr)
 {
   assert(ptr);
 
   {
     const font_t *font = (const font_t *)ptr;
-    font_t def; 
+    font_t def;
     font_def(&def);
     return !memcmp(font, &def, sizeof(font_t));
   }
 }
 
-void 
+void
 font_serialize(
-  const void *src, 
+  const void *src,
   binary_stream_t *stream)
 {
   assert(src && stream);
@@ -54,10 +54,10 @@ font_serialize(
   }
 }
 
-void 
+void
 font_deserialize(
-  void *dst, 
-  const allocator_t *allocator, 
+  void *dst,
+  const allocator_t *allocator,
   binary_stream_t *stream)
 {
   assert(dst && allocator && stream);
@@ -72,13 +72,13 @@ font_deserialize(
   }
 }
 
-size_t 
+size_t
 font_type_size(void)
 {
   return sizeof(font_t);
 }
 
-uint32_t 
+uint32_t
 font_owns_alloc(void)
 {
   return 0;
@@ -90,9 +90,9 @@ font_get_alloc(const void *ptr)
   return NULL;
 }
 
-void 
+void
 font_cleanup(
-  void *ptr, 
+  void *ptr,
   const allocator_t *allocator)
 {
   assert(ptr && !font_is_def(ptr));
@@ -108,16 +108,16 @@ font_cleanup(
 ////////////////////////////////////////////////////////////////////////////////
 void
 font_setup(
-  font_t *font, 
-  const char *image_file, 
-  const char *data_file, 
+  font_t *font,
+  const char *image_file,
+  const char *data_file,
   const allocator_t* allocator)
 {
   assert(allocator);
   assert(font && font_is_def(font));
   assert(
-    image_file && 
-    data_file && 
+    image_file &&
+    data_file &&
     "image file or data file are NULL!");
 
   cstring_setup(&font->image_file, image_file, allocator);
@@ -126,14 +126,14 @@ font_setup(
 
 font_t*
 font_create(
-  const char *image_file, 
-  const char *data_file, 
+  const char *image_file,
+  const char *data_file,
   const allocator_t *allocator)
 {
   assert(allocator);
   assert(
-    image_file && 
-    data_file && 
+    image_file &&
+    data_file &&
     "image file or data file are NULL!");
 
   {
@@ -146,7 +146,7 @@ font_create(
 
 void
 font_free(
-  font_t *font, 
+  font_t *font,
   const allocator_t *allocator)
 {
   font_cleanup(font, allocator);

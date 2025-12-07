@@ -1,12 +1,12 @@
 /**
  * @file font.h
  * @author khalilhenoud@gmail.com
- * @brief 
+ * @brief
  * @version 0.1
  * @date 2023-09-09
- * 
+ *
  * @copyright Copyright (c) 2023
- * 
+ *
  */
 #ifndef RUNTIME_FONT_H
 #define RUNTIME_FONT_H

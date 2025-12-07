@@ -1,12 +1,12 @@
 /**
- * @file utils.h
+ * @file mesh_utils.h
  * @author khalilhenoud@gmail.com
- * @brief 
+ * @brief
  * @version 0.1
  * @date 2023-09-04
- * 
+ *
  * @copyright Copyright (c) 2023
- * 
+ *
  */
 #ifndef SCENE_MESH_UTILS_H
 #define SCENE_MESH_UTILS_H
@@ -33,7 +33,7 @@ create_unit_sphere(const int32_t factor, const allocator_t *allocator);
 ENTITY_API
 mesh_t*
 create_unit_capsule(
-  const int32_t factor, 
+  const int32_t factor,
   const float half_height_to_radius_ratio,
   const allocator_t* allocator);
 

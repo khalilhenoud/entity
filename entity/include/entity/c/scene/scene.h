@@ -1,12 +1,12 @@
 /**
  * @file node.h
  * @author khalilhenoud@gmail.com
- * @brief 
+ * @brief
  * @version 0.1
  * @date 2023-09-10
- * 
+ *
  * @copyright Copyright (c) 2023
- * 
+ *
  */
 #ifndef SCENE_H
 #define SCENE_H
@@ -29,16 +29,16 @@ extern "C" {
 //|=============================================================================
 //|    *_def                    | YES
 //|    *_is_def                 | YES
-//|    *_replicate              | 
-//|    *_fullswap               | 
+//|    *_replicate              |
+//|    *_fullswap               |
 //|    *_serialize              | YES
 //|    *_deserialize            | YES
 //|    *_hash                   |
 //|    *_is_equal               |
 //|    *_type_size              | YES
 //|    *_type_alignment         |
-//|    *_type_id_count          | 
-//|    *_type_ids               | 
+//|    *_type_id_count          |
+//|    *_type_ids               |
 //|    *_owns_alloc             | YES
 //|    *_get_alloc              | YES
 //|    *_cleanup                | YES
@@ -56,7 +56,7 @@ struct scene_metadata_t {
   float player_angle;
 } scene_metadata_t;
 
-// TODO: assimp supports a camera/lights/skeletons/animations repo which we 
+// TODO: assimp supports a camera/lights/skeletons/animations repo which we
 // should support here.
 typedef
 struct scene_t {
@@ -77,28 +77,28 @@ void
 scene_def(void *ptr);
 
 ENTITY_API
-uint32_t 
+uint32_t
 scene_is_def(const void *ptr);
 
 ENTITY_API
-void 
+void
 scene_serialize(
-  const void *src, 
+  const void *src,
   binary_stream_t *stream);
 
 ENTITY_API
-void 
+void
 scene_deserialize(
-  void *dst, 
-  const allocator_t *allocator, 
+  void *dst,
+  const allocator_t *allocator,
   binary_stream_t *stream);
 
 ENTITY_API
-size_t 
+size_t
 scene_type_size(void);
 
 ENTITY_API
-uint32_t 
+uint32_t
 scene_owns_alloc(void);
 
 ENTITY_API
@@ -106,29 +106,29 @@ const allocator_t *
 scene_get_alloc(const void *ptr);
 
 ENTITY_API
-void 
+void
 scene_cleanup(
-  void *ptr, 
+  void *ptr,
   const allocator_t* allocator);
 
 ////////////////////////////////////////////////////////////////////////////////
 ENTITY_API
 void
 scene_setup(
-  scene_t *scene, 
+  scene_t *scene,
   const char *name,
   const allocator_t* allocator);
 
 ENTITY_API
 scene_t*
 scene_create(
-  const char* name, 
+  const char* name,
   const allocator_t* allocator);
 
 ENTITY_API
 void
 scene_free(
-  scene_t* scene, 
+  scene_t* scene,
   const allocator_t* allocator);
 
 #ifdef __cplusplus
