@@ -16,7 +16,7 @@
 #include <library/allocator/allocator.h>
 #include <library/core/core.h>
 #include <library/type_registry/type_registry.h>
-#include <math/c/face.h>
+#include <math/face.h>
 
 #define BVH_PRIMITIVES_PER_LEAF 8
 

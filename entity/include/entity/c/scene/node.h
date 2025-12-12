@@ -19,7 +19,7 @@ extern "C" {
 #include <entity/c/internal/module.h>
 #include <library/containers/cvector.h>
 #include <library/string/cstring.h>
-#include <math/c/matrix4f.h>
+#include <math/matrix4f.h>
 
 
 ////////////////////////////////////////////////////////////////////////////////

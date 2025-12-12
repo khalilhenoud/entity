@@ -13,8 +13,8 @@
 #include <entity/c/mesh/mesh.h>
 #include <entity/c/mesh/mesh_utils.h>
 #include <library/allocator/allocator.h>
-#include <math/c/common.h>
-#include <math/c/matrix4f.h>
+#include <math/common.h>
+#include <math/matrix4f.h>
 
 
 static

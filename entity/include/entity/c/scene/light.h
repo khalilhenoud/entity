@@ -19,7 +19,7 @@ extern "C" {
 #include <entity/c/internal/module.h>
 #include <entity/c/mesh/color.h>
 #include <library/string/cstring.h>
-#include <math/c/vector3f.h>
+#include <math/vector3f.h>
 
 
 ////////////////////////////////////////////////////////////////////////////////

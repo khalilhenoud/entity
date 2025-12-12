@@ -17,7 +17,7 @@ extern "C" {
 
 #include <stdint.h>
 #include <entity/c/internal/module.h>
-#include <math/c/vector3f.h>
+#include <math/vector3f.h>
 
 
 ////////////////////////////////////////////////////////////////////////////////
