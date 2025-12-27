@@ -15,8 +15,6 @@
 #include <library/core/core.h>
 #include <library/streams/binary_stream.h>
 #include <library/type_registry/type_registry.h>
-#include <math/common.h>
-#include <math/matrix4f.h>
 
 
 void

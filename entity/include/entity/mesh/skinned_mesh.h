@@ -1,15 +1,15 @@
 /**
- * @file node.h
+ * @file skinned_mesh.h
  * @author khalilhenoud@gmail.com
  * @brief
  * @version 0.1
- * @date 2023-09-10
+ * @date 2025-12-24
  *
- * @copyright Copyright (c) 2023
+ * @copyright Copyright (c) 2025
  *
  */
-#ifndef SCENE_H
-#define SCENE_H
+#ifndef SCENE_SKINNED_MESH_H
+#define SCENE_SKINNED_MESH_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -17,13 +17,11 @@ extern "C" {
 
 #include <stdint.h>
 #include <entity/internal/module.h>
-#include <library/containers/cvector.h>
-#include <library/string/cstring.h>
-#include <math/vector3f.h>
+#include <entity/mesh/mesh.h>
 
 
 ////////////////////////////////////////////////////////////////////////////////
-//| scene_t, '*' = scene
+//| skinned_mesh_t, '*' = skinned_mesh
 //|=============================================================================
 //| OPERATION                   | SUPPORTED
 //|=============================================================================
@@ -43,94 +41,67 @@ extern "C" {
 //|    *_get_alloc              | YES
 //|    *_cleanup                | YES
 ////////////////////////////////////////////////////////////////////////////////
-// NOTE:
-//  - should scene_t own its allocator?
-////////////////////////////////////////////////////////////////////////////////
 
 typedef struct allocator_t allocator_t;
 typedef struct binary_stream_t binary_stream_t;
 
 typedef
-struct scene_metadata_t {
-  point3f player_start;
-  float player_angle;
-} scene_metadata_t;
-
-// TODO: assimp supports a camera/lights/skeletons/animations repo which we
-// should support here.
-typedef
-struct scene_t {
-  cstring_t name;
-  scene_metadata_t metadata;
-  cvector_t node_repo;        // root is: node_repo.nodes[0];
-  cvector_t light_repo;
-  cvector_t mesh_repo;
-  cvector_t skinned_mesh_repo;
-  cvector_t material_repo;
-  cvector_t texture_repo;
-  cvector_t font_repo;
-  cvector_t camera_repo;
-  cvector_t bvh_repo;
-} scene_t;
+struct skinned_mesh_t {
+  mesh_t mesh;
+} skinned_mesh_t;
 
 ENTITY_API
 void
-scene_def(void *ptr);
+skinned_mesh_def(void *ptr);
 
 ENTITY_API
 uint32_t
-scene_is_def(const void *ptr);
+skinned_mesh_is_def(const void *ptr);
 
 ENTITY_API
 void
-scene_serialize(
+skinned_mesh_serialize(
   const void *src,
   binary_stream_t *stream);
 
 ENTITY_API
 void
-scene_deserialize(
+skinned_mesh_deserialize(
   void *dst,
   const allocator_t *allocator,
   binary_stream_t *stream);
 
 ENTITY_API
 size_t
-scene_type_size(void);
+skinned_mesh_type_size(void);
 
 ENTITY_API
 uint32_t
-scene_owns_alloc(void);
+skinned_mesh_owns_alloc(void);
 
 ENTITY_API
 const allocator_t *
-scene_get_alloc(const void *ptr);
+skinned_mesh_get_alloc(const void *ptr);
 
 ENTITY_API
 void
-scene_cleanup(
+skinned_mesh_cleanup(
   void *ptr,
-  const allocator_t* allocator);
+  const allocator_t *allocator);
 
 ////////////////////////////////////////////////////////////////////////////////
 ENTITY_API
 void
-scene_setup(
-  scene_t *scene,
-  const char *name,
-  const allocator_t* allocator);
-
-ENTITY_API
-scene_t*
-scene_create(
-  const char* name,
-  const allocator_t* allocator);
-
-ENTITY_API
-void
-scene_free(
-  scene_t* scene,
-  const allocator_t* allocator);
+skinned_mesh_setup(
+  skinned_mesh_t *skinned_mesh,
+  float *vertices,
+  float *normals,
+  float *uvs,
+  uint32_t vertices_count,
+  uint32_t *indices,
+  uint32_t indices_count,
+  material_array_t materials,
+  const allocator_t *allocator);
 
 #ifdef __cplusplus
 }

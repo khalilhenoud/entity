@@ -13,6 +13,7 @@
 #include <entity/mesh/material.h>
 #include <entity/mesh/mesh.h>
 #include <entity/mesh/mesh_utils.h>
+#include <entity/mesh/skinned_mesh.h>
 #include <entity/mesh/texture.h>
 #include <entity/misc/font.h>
 #include <entity/scene/camera.h>
@@ -66,6 +67,7 @@ scene_serialize(
     cvector_serialize(&scene->node_repo, stream);
     cvector_serialize(&scene->light_repo, stream);
     cvector_serialize(&scene->mesh_repo, stream);
+    cvector_serialize(&scene->skinned_mesh_repo, stream);
     cvector_serialize(&scene->material_repo, stream);
     cvector_serialize(&scene->texture_repo, stream);
     cvector_serialize(&scene->font_repo, stream);
@@ -95,6 +97,7 @@ scene_deserialize(
     cvector_deserialize(&scene->node_repo, allocator, stream);
     cvector_deserialize(&scene->light_repo, allocator, stream);
     cvector_deserialize(&scene->mesh_repo, allocator, stream);
+    cvector_deserialize(&scene->skinned_mesh_repo, allocator, stream);
     cvector_deserialize(&scene->material_repo, allocator, stream);
     cvector_deserialize(&scene->texture_repo, allocator, stream);
     cvector_deserialize(&scene->font_repo, allocator, stream);
@@ -134,6 +137,7 @@ scene_cleanup(
     scene_t *scene = (scene_t *)ptr;
     cstring_cleanup2(&scene->name);
     cvector_cleanup2(&scene->mesh_repo);
+    cvector_cleanup2(&scene->skinned_mesh_repo);
     cvector_cleanup2(&scene->node_repo);
     cvector_cleanup2(&scene->font_repo);
     cvector_cleanup2(&scene->light_repo);

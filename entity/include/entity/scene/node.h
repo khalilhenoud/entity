@@ -52,10 +52,16 @@ typedef struct allocator_t allocator_t;
 typedef struct binary_stream_t binary_stream_t;
 
 typedef
+struct node_resource_t {
+  uint32_t type_id;           // e.g: get_type_id(mesh_t), etc...
+  uint32_t index;             // index into the appropriate array given type_id
+} node_resource_t;
+
+typedef
 struct node_t {
   cstring_t name;
   matrix4f transform;
-  cvector_t meshes;           // uint32_t
+  cvector_t resources;        // node_resource_t
   cvector_t nodes;            // uint32_t
 } node_t;
 
@@ -78,7 +84,7 @@ void
 node_deserialize(
   void *dst,
   const allocator_t *allocator,
-  binary_stream_t* stream);
+  binary_stream_t *stream);
 
 ENTITY_API
 size_t
@@ -96,7 +102,7 @@ ENTITY_API
 void
 node_cleanup(
   void *ptr,
-  const allocator_t* allocator);
+  const allocator_t *allocator);
 
 #ifdef __cplusplus
 }

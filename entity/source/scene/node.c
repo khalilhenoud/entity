@@ -51,7 +51,7 @@ node_serialize(
     const node_t *node = (const node_t *)src;
     cstring_serialize(&node->name, stream);
     binary_stream_write(stream, &node->transform, sizeof(matrix4f));
-    cvector_serialize(&node->meshes, stream);
+    cvector_serialize(&node->resources, stream);
     cvector_serialize(&node->nodes, stream);
   }
 }
@@ -71,8 +71,8 @@ node_deserialize(
     cstring_deserialize(&node->name, allocator, stream);
     binary_stream_read(
       stream, (uint8_t *)&node->transform, sizeof(matrix4f), sizeof(matrix4f));
-    cvector_def(&node->meshes);
-    cvector_deserialize(&node->meshes, allocator, stream);
+    cvector_def(&node->resources);
+    cvector_deserialize(&node->resources, allocator, stream);
     cvector_def(&node->nodes);
     cvector_deserialize(&node->nodes, allocator, stream);
   }
@@ -107,7 +107,7 @@ node_cleanup(
   {
     node_t *node = (node_t *)ptr;
     cstring_cleanup2(&node->name);
-    cvector_cleanup2(&node->meshes);
+    cvector_cleanup2(&node->resources);
     cvector_cleanup2(&node->nodes);
     node_def(node);
   }

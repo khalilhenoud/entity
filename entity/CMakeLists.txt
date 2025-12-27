@@ -9,6 +9,7 @@ add_library(${PROJECT_NAME} SHARED
         ./source/mesh/mesh.c
         ./source/mesh/material.c
         ./source/mesh/texture.c
+        ./source/mesh/skinned_mesh.c
         ./source/misc/font.c
         ./source/runtime/font_utils.c
         ./source/runtime/texture_utils.c
