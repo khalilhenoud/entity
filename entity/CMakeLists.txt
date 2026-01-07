@@ -14,6 +14,7 @@ add_library(${PROJECT_NAME} SHARED
         ./source/runtime/font_utils.c
         ./source/runtime/texture_utils.c
         ./source/spatial/bvh.c
+        ./source/scene/animation.c
         ./source/scene/camera.c
         ./source/scene/light.c
         ./source/scene/node.c

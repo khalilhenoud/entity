@@ -18,6 +18,17 @@
 
 
 void
+bone_def(void *ptr)
+{
+  assert(ptr);
+
+  {
+    bone_t *bone = (bone_t *)ptr;
+    memset(bone, 0, sizeof(bone_t));
+  }
+}
+
+void
 skinned_mesh_def(void *ptr)
 {
   assert(ptr);
@@ -25,6 +36,19 @@ skinned_mesh_def(void *ptr)
   {
     skinned_mesh_t *skinned_mesh = (skinned_mesh_t *)ptr;
     memset(skinned_mesh, 0, sizeof(skinned_mesh_t));
+  }
+}
+
+uint32_t
+bone_is_def(const void *ptr)
+{
+  assert(ptr);
+
+  {
+    const bone_t *bone = (const bone_t *)ptr;
+    bone_t def;
+    bone_def(&def);
+    return !memcmp(bone, &def, sizeof(bone_t));
   }
 }
 
@@ -42,6 +66,21 @@ skinned_mesh_is_def(const void *ptr)
 }
 
 void
+bone_serialize(
+  const void *src,
+  binary_stream_t *stream)
+{
+  assert(src && stream);
+
+  {
+    const bone_t *bone = (const bone_t *)src;
+    cstring_serialize(&bone->name, stream);
+    binary_stream_write(stream, &bone->offset_matrix, sizeof(matrix4f));
+    cvector_serialize(&bone->vertex_weights, stream);
+  }
+}
+
+void
 skinned_mesh_serialize(
   const void *src,
   binary_stream_t *stream)
@@ -51,6 +90,26 @@ skinned_mesh_serialize(
   {
     const skinned_mesh_t *skinned_mesh = (const skinned_mesh_t *)src;
     mesh_serialize(&skinned_mesh->mesh, stream);
+  }
+}
+
+void
+bone_deserialize(
+  void *dst,
+  const allocator_t *allocator,
+  binary_stream_t *stream)
+{
+  assert(dst && allocator && stream);
+
+  {
+    bone_t *bone = (bone_t *)dst;
+    cstring_def(&bone->name);
+    cstring_deserialize(&bone->name, allocator, stream);
+    binary_stream_read(
+      stream, (uint8_t *)&bone->offset_matrix,
+      sizeof(matrix4f), sizeof(matrix4f));
+    cvector_def(&bone->vertex_weights);
+    cvector_deserialize(&bone->vertex_weights, allocator, stream);
   }
 }
 
@@ -69,9 +128,21 @@ skinned_mesh_deserialize(
 }
 
 size_t
+bone_type_size(void)
+{
+  return sizeof(bone_t);
+}
+
+size_t
 skinned_mesh_type_size(void)
 {
   return sizeof(skinned_mesh_t);
+}
+
+uint32_t
+bone_owns_alloc(void)
+{
+  return 0;
 }
 
 uint32_t
@@ -81,9 +152,31 @@ skinned_mesh_owns_alloc(void)
 }
 
 const allocator_t *
+bone_get_alloc(const void *ptr)
+{
+  return NULL;
+}
+
+const allocator_t *
 skinned_mesh_get_alloc(const void *ptr)
 {
   return NULL;
+}
+
+void
+bone_cleanup(
+  void *ptr,
+  const allocator_t *allocator)
+{
+  assert(ptr && !bone_is_def(ptr));
+  assert(allocator);
+
+  {
+    bone_t *bone = (bone_t *)ptr;
+    cstring_cleanup2(&bone->name);
+    cvector_cleanup2(&bone->vertex_weights);
+    memset(bone, 0, sizeof(bone_t));
+  }
 }
 
 void
@@ -97,6 +190,7 @@ skinned_mesh_cleanup(
   {
     skinned_mesh_t *skinned_mesh = (skinned_mesh_t *)ptr;
     mesh_cleanup(&skinned_mesh->mesh, allocator);
+    cvector_cleanup2(&skinned_mesh->bones);
     memset(skinned_mesh, 0, sizeof(skinned_mesh_t));
   }
 }
@@ -144,4 +238,19 @@ INITIALIZER(register_skinned_mesh_t)
   vtable.fn_get_alloc = skinned_mesh_get_alloc;
   vtable.fn_cleanup = skinned_mesh_cleanup;
   register_type(get_type_id(skinned_mesh_t), &vtable);
+}
+
+INITIALIZER(register_bone_t)
+{
+  vtable_t vtable;
+  memset(&vtable, 0, sizeof(vtable_t));
+  vtable.fn_def = bone_def;
+  vtable.fn_is_def = bone_is_def;
+  vtable.fn_serialize = bone_serialize;
+  vtable.fn_deserialize = bone_deserialize;
+  vtable.fn_type_size = bone_type_size;
+  vtable.fn_owns_alloc = bone_owns_alloc;
+  vtable.fn_get_alloc = bone_get_alloc;
+  vtable.fn_cleanup = bone_cleanup;
+  register_type(get_type_id(bone_t), &vtable);
 }

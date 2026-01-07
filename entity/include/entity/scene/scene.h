@@ -63,6 +63,7 @@ struct scene_t {
   cstring_t name;
   scene_metadata_t metadata;
   cvector_t node_repo;        // root is: node_repo.nodes[0];
+  cvector_t animation_repo;
   cvector_t light_repo;
   cvector_t mesh_repo;
   cvector_t skinned_mesh_repo;

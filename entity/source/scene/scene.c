@@ -16,6 +16,7 @@
 #include <entity/mesh/skinned_mesh.h>
 #include <entity/mesh/texture.h>
 #include <entity/misc/font.h>
+#include <entity/scene/animation.h>
 #include <entity/scene/camera.h>
 #include <entity/scene/light.h>
 #include <entity/scene/node.h>
@@ -65,6 +66,7 @@ scene_serialize(
     binary_stream_write(stream, &scene->metadata, sizeof(scene_metadata_t));
 
     cvector_serialize(&scene->node_repo, stream);
+    cvector_serialize(&scene->animation_repo, stream);
     cvector_serialize(&scene->light_repo, stream);
     cvector_serialize(&scene->mesh_repo, stream);
     cvector_serialize(&scene->skinned_mesh_repo, stream);
@@ -95,6 +97,7 @@ scene_deserialize(
       sizeof(scene_metadata_t), sizeof(scene_metadata_t));
 
     cvector_deserialize(&scene->node_repo, allocator, stream);
+    cvector_deserialize(&scene->animation_repo, allocator, stream);
     cvector_deserialize(&scene->light_repo, allocator, stream);
     cvector_deserialize(&scene->mesh_repo, allocator, stream);
     cvector_deserialize(&scene->skinned_mesh_repo, allocator, stream);
@@ -139,6 +142,7 @@ scene_cleanup(
     cvector_cleanup2(&scene->mesh_repo);
     cvector_cleanup2(&scene->skinned_mesh_repo);
     cvector_cleanup2(&scene->node_repo);
+    cvector_cleanup2(&scene->animation_repo);
     cvector_cleanup2(&scene->font_repo);
     cvector_cleanup2(&scene->light_repo);
     cvector_cleanup2(&scene->material_repo);
