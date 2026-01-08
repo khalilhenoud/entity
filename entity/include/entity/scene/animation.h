@@ -98,6 +98,7 @@ struct anim_node_t {
 
 typedef
 struct animation_t {
+  cstring_t name;
   float duration;
   float ticks_per_second;
   cvector_t channels;                 // anim_node_t

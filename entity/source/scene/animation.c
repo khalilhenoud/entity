@@ -49,6 +49,7 @@ animation_serialize(
 
   {
     const animation_t *animation = (const animation_t *)src;
+    cstring_serialize(&animation->name, stream);
     binary_stream_write(stream, &animation->duration, sizeof(float));
     binary_stream_write(stream, &animation->ticks_per_second, sizeof(float));
     cvector_serialize(&animation->channels, stream);
@@ -65,6 +66,8 @@ animation_deserialize(
 
   {
     animation_t *animation = (animation_t *)dst;
+    cstring_def(&animation->name);
+    cstring_deserialize(&animation->name, allocator, stream);
     binary_stream_read(
       stream, (uint8_t *)&animation->duration,
       sizeof(float), sizeof(float));
@@ -104,7 +107,8 @@ animation_cleanup(
 
   {
     animation_t *animation = (animation_t *)ptr;
-    cstring_cleanup2(&animation->channels);
+    cstring_cleanup2(&animation->name);
+    cvector_cleanup2(&animation->channels);
     animation_def(animation);
   }
 }
