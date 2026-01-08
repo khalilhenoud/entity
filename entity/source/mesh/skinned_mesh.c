@@ -90,7 +90,7 @@ skinned_mesh_serialize(
   {
     const skinned_mesh_t *skinned_mesh = (const skinned_mesh_t *)src;
     mesh_serialize(&skinned_mesh->mesh, stream);
-    // cvector_serialize(&skinned_mesh->bones, stream);
+    cvector_serialize(&skinned_mesh->bones, stream);
   }
 }
 
@@ -126,7 +126,7 @@ skinned_mesh_deserialize(
     skinned_mesh_t *skinned_mesh = (skinned_mesh_t *)dst;
     mesh_deserialize(&skinned_mesh->mesh, allocator, stream);
     cvector_def(&skinned_mesh->bones);
-    // cvector_deserialize(&skinned_mesh->bones, allocator, stream);
+    cvector_deserialize(&skinned_mesh->bones, allocator, stream);
   }
 }
 
