@@ -18,6 +18,17 @@
 
 
 void
+skel_node_def(void *ptr)
+{
+  assert(ptr);
+
+  {
+    skel_node_t *node = (skel_node_t *)ptr;
+    memset(node, 0, sizeof(skel_node_t));
+  }
+}
+
+void
 bone_def(void *ptr)
 {
   assert(ptr);
@@ -36,6 +47,19 @@ skinned_mesh_def(void *ptr)
   {
     skinned_mesh_t *skinned_mesh = (skinned_mesh_t *)ptr;
     memset(skinned_mesh, 0, sizeof(skinned_mesh_t));
+  }
+}
+
+uint32_t
+skel_node_is_def(const void *ptr)
+{
+  assert(ptr);
+
+  {
+    const skel_node_t *node = (const skel_node_t *)ptr;
+    skel_node_t def;
+    skel_node_def(&def);
+    return !memcmp(node, &def, sizeof(skel_node_t));
   }
 }
 
@@ -66,6 +90,21 @@ skinned_mesh_is_def(const void *ptr)
 }
 
 void
+skel_node_serialize(
+  const void *src,
+  binary_stream_t *stream)
+{
+  assert(src && stream);
+
+  {
+    const skel_node_t *node = (const skel_node_t *)src;
+    cstring_serialize(&node->name, stream);
+    binary_stream_write(stream, &node->transform, sizeof(matrix4f));
+    cvector_serialize(&node->skel_nodes, stream);
+  }
+}
+
+void
 bone_serialize(
   const void *src,
   binary_stream_t *stream)
@@ -91,6 +130,27 @@ skinned_mesh_serialize(
     const skinned_mesh_t *skinned_mesh = (const skinned_mesh_t *)src;
     mesh_serialize(&skinned_mesh->mesh, stream);
     cvector_serialize(&skinned_mesh->bones, stream);
+    cvector_serialize(&skinned_mesh->skeleton.nodes, stream);
+  }
+}
+
+void
+skel_node_deserialize(
+  void *dst,
+  const allocator_t *allocator,
+  binary_stream_t *stream)
+{
+  assert(dst && allocator && stream);
+
+  {
+    skel_node_t *node = (skel_node_t *)dst;
+    cstring_def(&node->name);
+    cstring_deserialize(&node->name, allocator, stream);
+    binary_stream_read(
+      stream, (uint8_t *)&node->transform,
+      sizeof(matrix4f), sizeof(matrix4f));
+    cvector_def(&node->skel_nodes);
+    cvector_deserialize(&node->skel_nodes, allocator, stream);
   }
 }
 
@@ -127,7 +187,15 @@ skinned_mesh_deserialize(
     mesh_deserialize(&skinned_mesh->mesh, allocator, stream);
     cvector_def(&skinned_mesh->bones);
     cvector_deserialize(&skinned_mesh->bones, allocator, stream);
+    cvector_def(&skinned_mesh->skeleton.nodes);
+    cvector_deserialize(&skinned_mesh->skeleton.nodes, allocator, stream);
   }
+}
+
+size_t
+skel_node_type_size(void)
+{
+  return sizeof(skel_node_t);
 }
 
 size_t
@@ -143,6 +211,12 @@ skinned_mesh_type_size(void)
 }
 
 uint32_t
+skel_node_owns_alloc(void)
+{
+  return 0;
+}
+
+uint32_t
 bone_owns_alloc(void)
 {
   return 0;
@@ -152,6 +226,12 @@ uint32_t
 skinned_mesh_owns_alloc(void)
 {
   return 0;
+}
+
+const allocator_t *
+skel_node_get_alloc(const void *ptr)
+{
+  return NULL;
 }
 
 const allocator_t *
@@ -167,12 +247,26 @@ skinned_mesh_get_alloc(const void *ptr)
 }
 
 void
+skel_node_cleanup(
+  void *ptr,
+  const allocator_t *allocator)
+{
+  assert(ptr && allocator && !skel_node_is_def(ptr));
+
+  {
+    skel_node_t *node = (skel_node_t *)ptr;
+    cstring_cleanup2(&node->name);
+    cvector_cleanup2(&node->skel_nodes);
+    memset(node, 0, sizeof(skel_node_t));
+  }
+}
+
+void
 bone_cleanup(
   void *ptr,
   const allocator_t *allocator)
 {
-  assert(ptr && !bone_is_def(ptr));
-  assert(allocator);
+  assert(ptr && allocator && !bone_is_def(ptr));
 
   {
     bone_t *bone = (bone_t *)ptr;
@@ -187,13 +281,13 @@ skinned_mesh_cleanup(
   void *ptr,
   const allocator_t *allocator)
 {
-  assert(ptr && !skinned_mesh_is_def(ptr));
-  assert(allocator);
+  assert(ptr && allocator && !skinned_mesh_is_def(ptr));
 
   {
     skinned_mesh_t *skinned_mesh = (skinned_mesh_t *)ptr;
     mesh_cleanup(&skinned_mesh->mesh, allocator);
     cvector_cleanup2(&skinned_mesh->bones);
+    cvector_cleanup2(&skinned_mesh->skeleton.nodes);
     memset(skinned_mesh, 0, sizeof(skinned_mesh_t));
   }
 }
@@ -241,6 +335,21 @@ INITIALIZER(register_skinned_mesh_t)
   vtable.fn_get_alloc = skinned_mesh_get_alloc;
   vtable.fn_cleanup = skinned_mesh_cleanup;
   register_type(get_type_id(skinned_mesh_t), &vtable);
+}
+
+INITIALIZER(register_skel_node_t)
+{
+  vtable_t vtable;
+  memset(&vtable, 0, sizeof(vtable_t));
+  vtable.fn_def = skel_node_def;
+  vtable.fn_is_def = skel_node_is_def;
+  vtable.fn_serialize = skel_node_serialize;
+  vtable.fn_deserialize = skel_node_deserialize;
+  vtable.fn_type_size = skel_node_type_size;
+  vtable.fn_owns_alloc = skel_node_owns_alloc;
+  vtable.fn_get_alloc = skel_node_get_alloc;
+  vtable.fn_cleanup = skel_node_cleanup;
+  register_type(get_type_id(skel_node_t), &vtable);
 }
 
 INITIALIZER(register_bone_t)
