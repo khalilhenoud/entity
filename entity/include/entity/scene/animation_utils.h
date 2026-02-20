@@ -1,7 +1,7 @@
 /**
  * @file animation_utils.h
  * @author khalilhenoud@gmail.com
- * @brief provide functionality for playing the animation (proof of concept)
+ * @brief tmp: functionality for playing the animation (proof of concept)
  * @version 0.1
  * @date 2026-01-15
  *
@@ -18,10 +18,7 @@ extern "C" {
 #include <entity/internal/module.h>
 
 
-// TODO: This is intended as a proof of concept that the animation code works,
-// the final code will be very different.
-// This is also missing functionality.
-
+// NOTE: intended as a proof of concept that the animation code works
 typedef struct allocator_t allocator_t;
 typedef struct mesh_t mesh_t;
 typedef struct skinned_mesh_t skinned_mesh_t;
@@ -35,7 +32,7 @@ play_anim(
   skinned_mesh_t *skinned_mesh,
   const allocator_t *allocator);
 
-// anim is no longer valid after this...
+// anim_sq is no longer valid after this...
 ENTITY_API
 void
 stop_anim(anim_sequence_t *anim_sq);
@@ -44,10 +41,9 @@ ENTITY_API
 void
 update_anim(anim_sequence_t *anim_sq, float delta_t);
 
-// return the fully transformed mesh to be displayed this frame.
 ENTITY_API
-mesh_t *
-get_anim_mesh(anim_sequence_t *anim_sq);
+matrix4f
+get_anim_bone_transform(anim_sequence_t *anim_sq, uint32_t index);
 
 #ifdef __cplusplus
 }
