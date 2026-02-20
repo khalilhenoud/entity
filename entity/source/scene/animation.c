@@ -149,6 +149,7 @@ anim_node_serialize(
     cstring_serialize(&anim_node->name, stream);
     cvector_serialize(&anim_node->position_keys, stream);
     cvector_serialize(&anim_node->rotation_keys, stream);
+    cvector_serialize(&anim_node->rotation_keys2, stream);
     cvector_serialize(&anim_node->scale_keys, stream);
   }
 }
@@ -169,6 +170,8 @@ anim_node_deserialize(
     cvector_deserialize(&anim_node->position_keys, allocator, stream);
     cvector_def(&anim_node->rotation_keys);
     cvector_deserialize(&anim_node->rotation_keys, allocator, stream);
+    cvector_def(&anim_node->rotation_keys2);
+    cvector_deserialize(&anim_node->rotation_keys2, allocator, stream);
     cvector_def(&anim_node->scale_keys);
     cvector_deserialize(&anim_node->scale_keys, allocator, stream);
   }
@@ -205,6 +208,7 @@ anim_node_cleanup(
     cstring_cleanup2(&anim_node->name);
     cvector_cleanup2(&anim_node->position_keys);
     cvector_cleanup2(&anim_node->rotation_keys);
+    cvector_cleanup2(&anim_node->rotation_keys2);
     cvector_cleanup2(&anim_node->scale_keys);
     anim_node_def(anim_node);
   }
