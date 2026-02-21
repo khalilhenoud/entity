@@ -100,6 +100,7 @@ skel_node_serialize(
     const skel_node_t *node = (const skel_node_t *)src;
     cstring_serialize(&node->name, stream);
     binary_stream_write(stream, &node->transform, sizeof(matrix4f));
+    binary_stream_write(stream, &node->bone_index, sizeof(uint32_t));
     cvector_serialize(&node->skel_nodes, stream);
   }
 }
@@ -149,6 +150,9 @@ skel_node_deserialize(
     binary_stream_read(
       stream, (uint8_t *)&node->transform,
       sizeof(matrix4f), sizeof(matrix4f));
+    binary_stream_read(
+      stream, (uint8_t *)&node->bone_index,
+      sizeof(uint32_t), sizeof(uint32_t));
     cvector_def(&node->skel_nodes);
     cvector_deserialize(&node->skel_nodes, allocator, stream);
   }

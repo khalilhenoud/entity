@@ -99,7 +99,6 @@ struct anim_node_t {
   cstring_t name;
   cvector_t position_keys;
   cvector_t rotation_keys;
-  cvector_t rotation_keys2;
   cvector_t scale_keys;
 } anim_node_t;
 
