@@ -61,7 +61,6 @@ stop_anim(anim_sequence_t *anim_sq)
   }
 }
 
-
 static
 uint32_t
 find_translation(anim_node_t *channel, float time)
@@ -153,7 +152,6 @@ update_anim(anim_sequence_t *anim_sq, float delta_t)
     anim_sq, anim_time, &root_inverse, root, &root->transform, 0);
 }
 
-#if 0
 static
 void
 update_bone_transforms(
@@ -171,11 +169,10 @@ update_bone_transforms(
   matrix4f global_transform = mult_m4f(parent_transform, &node->transform);
   matrix4f *inter_node = cvector_as(&anim_sq->nodes, index, matrix4f);
 
-  // override node_transform if a valid channel exists
+  // override local_transform if a valid channel exists
   anim_node_t *channel = find_anim_channel(anim_sq->anim, &node->name);
-  matrix4f node_transform;
-  matrix4f_set_identity(&node_transform);
-  if (channel && 0) {
+  matrix4f local_transform = node->transform;
+  if (channel) {
     uint32_t indices;
     matrix4f s_r_t[3];
     matrix4f_set_identity(s_r_t + 0);
@@ -215,25 +212,11 @@ update_bone_transforms(
     {
       matrix4f intermediate;
       intermediate = mult_m4f(s_r_t + 1, s_r_t + 0);
-      node_transform = mult_m4f(s_r_t + 2, &intermediate);
+      local_transform = mult_m4f(s_r_t + 2, &intermediate);
     }
   }
 
-  {
-    matrix4f result = mult_m4f(&global_transform, &node_transform);
-    if (node->bone_index != UINT32_MAX) {
-      bone_t *bone = cvector_as(&skinned_mesh->bones, node->bone_index, bone_t);
-      result = mult_m4f(&result, &bone->offset_matrix);
-    }
-
-    if (node->skel_nodes.size != 0) {
-      result = mult_m4f(&result, &node->transform);
-      result = mult_m4f(root_inverse, &result);
-    } else
-      result = node->transform;
-
-    *inter_node = result;
-  }
+  *inter_node = local_transform;
 
   for (uint32_t i = 0; i < node->skel_nodes.size; ++i) {
     uint32_t child_index = *cvector_as(&node->skel_nodes, i, uint32_t);
@@ -242,100 +225,6 @@ update_bone_transforms(
       anim_sq, anim_time, root_inverse, child, &global_transform, child_index);
   }
 }
-#else
-static
-void
-update_bone_transforms(
-  anim_sequence_t *anim_sq,
-  float anim_time,
-  const matrix4f *root_inverse,
-  skel_node_t *node,
-  const matrix4f *parent_transform,
-  const uint32_t index)
-{
-  animation_t *anim = anim_sq->anim;
-  skinned_mesh_t *skinned_mesh = anim_sq->skinned_mesh;
-  skeleton_t *skeleton = &skinned_mesh->skeleton;
-
-  matrix4f global_transform = mult_m4f(parent_transform, &node->transform);
-  matrix4f *inter_node = cvector_as(&anim_sq->nodes, index, matrix4f);
-
-  // override node_transform if a valid channel exists
-  anim_node_t *channel = find_anim_channel(anim_sq->anim, &node->name);
-  matrix4f node_transform;
-  matrix4f_set_identity(&node_transform);
-  if (channel && 0) {
-    uint32_t indices;
-    matrix4f s_r_t[3];
-    matrix4f_set_identity(s_r_t + 0);
-    matrix4f_set_identity(s_r_t + 1);
-    matrix4f_set_identity(s_r_t + 2);
-
-    indices = find_scale(channel, anim_time);
-    if (indices != UINT32_MAX) {
-      scale_key_t *k = cvector_as(&channel->scale_keys, indices, scale_key_t);
-      vector3f scale = k->value;
-      matrix4f_scale(s_r_t + 0, scale.data[0], scale.data[1], scale.data[2]);
-    } else
-      matrix4f_set_identity(s_r_t + 0);
-
-    indices = find_rotation(channel, anim_time);
-    if (indices != UINT32_MAX) {
-      rotation_key_t *r = cvector_as(
-        &channel->rotation_keys, indices, rotation_key_t);
-      quatf rotation = r->value;
-      vector3f axis;
-      float angle;
-      get_quatf_axis_angle(&rotation, &axis, &angle);
-      angle = TO_DEGREES(angle);
-      matrix4f_set_axisangle(s_r_t + 1, &axis, angle);
-    } else
-      matrix4f_set_identity(s_r_t + 1);
-
-    indices = find_translation(channel, anim_time);
-    if (indices != UINT32_MAX) {
-      position_key_t *p = cvector_as(
-        &channel->position_keys, indices, position_key_t);
-      vector3f pos = p->value;
-      matrix4f_translation(s_r_t + 2, pos.data[0], pos.data[1], pos.data[2]);
-    } else
-      matrix4f_set_identity(s_r_t + 2);
-
-    {
-      matrix4f intermediate;
-      intermediate = mult_m4f(s_r_t + 1, s_r_t + 0);
-      node_transform = mult_m4f(s_r_t + 2, &intermediate);
-    }
-  }
-
-  {
-    // NOTE: the offset matrix does not include the root node translation, so
-    // basically to get the identity matrix, it is:
-    //    identity = root_inverse * offset_matrix * global_transform
-    matrix4f result = global_transform;//mult_m4f(&global_transform, &node_transform);
-    if (node->bone_index != UINT32_MAX) {
-      bone_t *bone = cvector_as(&skinned_mesh->bones, node->bone_index, bone_t);
-      result = mult_m4f(&result, &bone->offset_matrix);
-    }
-
-    if (node->skel_nodes.size != 0) {
-      result = mult_m4f(&result, &node->transform);
-      result = mult_m4f(root_inverse, &result);
-      // result = node->transform;
-    } else
-      result = node->transform;
-
-    *inter_node = result;
-  }
-
-  for (uint32_t i = 0; i < node->skel_nodes.size; ++i) {
-    uint32_t child_index = *cvector_as(&node->skel_nodes, i, uint32_t);
-    skel_node_t *child = cvector_as(&skeleton->nodes, child_index, skel_node_t);
-    update_bone_transforms(
-      anim_sq, anim_time, root_inverse, child, &global_transform, child_index);
-  }
-}
-#endif
 
 matrix4f
 get_anim_bone_transform(anim_sequence_t *anim_sq, uint32_t index)
