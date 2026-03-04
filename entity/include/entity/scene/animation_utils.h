@@ -43,7 +43,11 @@ update_anim(anim_sequence_t *anim_sq, float delta_t);
 
 ENTITY_API
 matrix4f
-get_anim_bone_transform(anim_sequence_t *anim_sq, uint32_t index);
+get_node_local_transform(anim_sequence_t *anim_sq, uint32_t index);
+
+ENTITY_API
+float *
+get_skin(anim_sequence_t *anim_sq);
 
 #ifdef __cplusplus
 }

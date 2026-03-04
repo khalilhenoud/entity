@@ -19,10 +19,19 @@
 
 
 typedef
+struct bone_weight_t {
+  uint32_t id;
+  float weight;
+} bone_weight_t;
+
+typedef
 struct anim_sequence_t {
   animation_t *anim;
   skinned_mesh_t *skinned_mesh;
-  cvector_t nodes;                      // skel_node_t
+  cvector_t local_transforms;        // node local transforms
+  cvector_t final_transforms;        // bone final transforms
+  cvector_t vertex_to_bones;         // cvector_t of cvector_t of bone_weight_t
+  cvector_t vertices;
   const allocator_t *allocator;
   float time;
 } anim_sequence_t;
@@ -44,8 +53,42 @@ play_anim(
     anim_sq->skinned_mesh = skinned_mesh;
     anim_sq->time = 0.f;
 
-    cvector_setup(&anim_sq->nodes, get_type_data(matrix4f), 0, _alloc);
-    cvector_resize(&anim_sq->nodes, skinned_mesh->skeleton.nodes.size);
+    cvector_setup(&anim_sq->vertices, get_type_data(float), 0, _alloc);
+    cvector_resize(&anim_sq->vertices, mesh->vertices.size);
+
+    cvector_setup(
+      &anim_sq->local_transforms, get_type_data(matrix4f), 0, _alloc);
+    cvector_resize(
+      &anim_sq->local_transforms, skinned_mesh->skeleton.nodes.size);
+
+    cvector_setup(
+      &anim_sq->final_transforms, get_type_data(matrix4f), 0, _alloc);
+    cvector_resize(
+      &anim_sq->final_transforms, skinned_mesh->bones.size);
+
+    cvector_setup(
+      &anim_sq->vertex_to_bones, get_type_data(cvector_t), 0, _alloc);
+    cvector_resize(&anim_sq->vertex_to_bones, mesh->vertices.size / 3);
+
+    for (uint32_t i = 0; i < anim_sq->vertex_to_bones.size; ++i) {
+      cvector_t *inner = cvector_as(&anim_sq->vertex_to_bones, i, cvector_t);
+      cvector_setup(inner, get_type_data(bone_weight_t), 4, _alloc);
+    }
+
+    for (uint32_t i = 0; i < skinned_mesh->bones.size; ++i) {
+      bone_t *bone = cvector_as(&skinned_mesh->bones, i, bone_t);
+
+      for (uint32_t j = 0; j < bone->vertex_weights.size; ++j) {
+        vertex_weight_t *data = cvector_as(
+          &bone->vertex_weights, j, vertex_weight_t);
+
+        cvector_t *vertex_weight = cvector_as(
+          &anim_sq->vertex_to_bones, data->vertex_id, cvector_t);
+
+        bone_weight_t bone_weight = { i, data->weight };
+        cvector_push_back(vertex_weight, bone_weight, bone_weight_t);
+      }
+    }
 
     return anim_sq;
   }
@@ -56,7 +99,10 @@ stop_anim(anim_sequence_t *anim_sq)
 {
   {
     const allocator_t *_alloc = anim_sq->allocator;
-    cvector_cleanup2(&anim_sq->nodes);
+    cvector_cleanup2(&anim_sq->vertices);
+    cvector_cleanup2(&anim_sq->local_transforms);
+    cvector_cleanup2(&anim_sq->final_transforms);
+    cvector_cleanup2(&anim_sq->vertex_to_bones);
     _alloc->mem_free(anim_sq);
   }
 }
@@ -136,6 +182,10 @@ update_bone_transforms(
   const matrix4f *parent_transform,
   const uint32_t index);
 
+static
+void
+update_vertices(anim_sequence_t *anim_sq);
+
 void
 update_anim(anim_sequence_t *anim_sq, float delta_t)
 {
@@ -148,10 +198,55 @@ update_anim(anim_sequence_t *anim_sq, float delta_t)
 
   skel_node_t *root = cvector_as(&skinned_mesh->skeleton.nodes, 0, skel_node_t);
   matrix4f root_inverse = inverse_m4f(&root->transform);
+  matrix4f identity;
+  matrix4f_set_identity(&identity);
   update_bone_transforms(
-    anim_sq, anim_time, &root_inverse, root, &root->transform, 0);
+    anim_sq, anim_time, &root_inverse, root, &identity, 0);
+
+  update_vertices(anim_sq);
 }
 
+static
+void
+update_vertices(anim_sequence_t *anim_sq)
+{
+  animation_t *anim = anim_sq->anim;
+  skinned_mesh_t *skinned_mesh = anim_sq->skinned_mesh;
+  mesh_t *mesh = &skinned_mesh->mesh;
+
+  float *vertices = (float *)anim_sq->vertices.data;
+  float *original = (float *)mesh->vertices.data;
+  for (uint32_t i = 0, size = mesh->vertices.size / 3; i < size; ++i) {
+    float total_weight = 0.f;
+    uint32_t idx = i * 3;
+    point3f vertex = { original[idx], original[idx + 1], original[idx + 2] };
+    point3f skinned = { 0.f, 0.f, 0.f };
+
+    cvector_t *to_bones = cvector_as(&anim_sq->vertex_to_bones, i, cvector_t);
+    vertices[i * 3 + 0] = vertices[i * 3 + 1] = vertices[i * 3 + 2] = 0.f;
+
+    for (uint32_t j = 0; j < to_bones->size; ++j) {
+      bone_weight_t *bone_weight = cvector_as(to_bones, j, bone_weight_t);
+      matrix4f *final_transform = cvector_as(
+        &anim_sq->final_transforms, bone_weight->id, matrix4f);
+      point3f intermediate = { 0.f, 0.f, 0.f };
+
+      intermediate = mult_m4f_p3f(final_transform, &vertex);
+      intermediate = mult_v3f(&intermediate, bone_weight->weight);
+      total_weight += bone_weight->weight;
+      add_set_v3f(&skinned, &intermediate);
+    }
+
+    assert(IS_SAME_NP(total_weight, 1.f));
+
+    vertices[idx + 0] = skinned.data[0];
+    vertices[idx + 1] = skinned.data[1];
+    vertices[idx + 2] = skinned.data[2];
+  }
+}
+
+// NOTE: Since this is cpu only, root_inverse is not used right now, keeping it
+// for later use
 static
 void
 update_bone_transforms(
@@ -165,9 +260,11 @@ update_bone_transforms(
   animation_t *anim = anim_sq->anim;
   skinned_mesh_t *skinned_mesh = anim_sq->skinned_mesh;
   skeleton_t *skeleton = &skinned_mesh->skeleton;
+  bone_t *bone = node->bone_index == UINT32_MAX ?
+    NULL : cvector_as(&skinned_mesh->bones, node->bone_index, bone_t);
 
-  matrix4f global_transform = mult_m4f(parent_transform, &node->transform);
-  matrix4f *inter_node = cvector_as(&anim_sq->nodes, index, matrix4f);
+  matrix4f global_transform;
+  matrix4f *local = cvector_as(&anim_sq->local_transforms, index, matrix4f);
 
   // override local_transform if a valid channel exists
   anim_node_t *channel = find_anim_channel(anim_sq->anim, &node->name);
@@ -216,7 +313,14 @@ update_bone_transforms(
     }
   }
 
-  *inter_node = local_transform;
+  global_transform = mult_m4f(parent_transform, &local_transform);
+  *local = local_transform;
+
+  if (bone) {
+    matrix4f *final_transform = cvector_as(
+      &anim_sq->final_transforms, node->bone_index, matrix4f);
+    *final_transform = mult_m4f(&global_transform, &bone->offset_matrix);
+  }
 
   for (uint32_t i = 0; i < node->skel_nodes.size; ++i) {
     uint32_t child_index = *cvector_as(&node->skel_nodes, i, uint32_t);
@@ -227,7 +331,13 @@ update_bone_transforms(
 }
 
 matrix4f
-get_anim_bone_transform(anim_sequence_t *anim_sq, uint32_t index)
+get_node_local_transform(anim_sequence_t *anim_sq, uint32_t index)
 {
-  return *cvector_as(&anim_sq->nodes, index, matrix4f);
+  return *cvector_as(&anim_sq->local_transforms, index, matrix4f);
+}
+
+float *
+get_skin(anim_sequence_t *anim_sq)
+{
+  return (float *)anim_sq->vertices.data;
 }
