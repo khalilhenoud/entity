@@ -32,6 +32,7 @@ struct anim_sequence_t {
   cvector_t final_transforms;        // bone final transforms
   cvector_t vertex_to_bones;         // cvector_t of cvector_t of bone_weight_t
   cvector_t vertices;
+  cvector_t normals;
   const allocator_t *allocator;
   float time;
 } anim_sequence_t;
@@ -55,6 +56,9 @@ play_anim(
 
     cvector_setup(&anim_sq->vertices, get_type_data(float), 0, _alloc);
     cvector_resize(&anim_sq->vertices, mesh->vertices.size);
+
+    cvector_setup(&anim_sq->normals, get_type_data(float), 0, _alloc);
+    cvector_resize(&anim_sq->normals, mesh->normals.size);
 
     cvector_setup(
       &anim_sq->local_transforms, get_type_data(matrix4f), 0, _alloc);
@@ -100,6 +104,7 @@ stop_anim(anim_sequence_t *anim_sq)
   {
     const allocator_t *_alloc = anim_sq->allocator;
     cvector_cleanup2(&anim_sq->vertices);
+    cvector_cleanup2(&anim_sq->normals);
     cvector_cleanup2(&anim_sq->local_transforms);
     cvector_cleanup2(&anim_sq->final_transforms);
     cvector_cleanup2(&anim_sq->vertex_to_bones);
@@ -215,26 +220,47 @@ update_vertices(anim_sequence_t *anim_sq)
   mesh_t *mesh = &skinned_mesh->mesh;
 
   float *vertices = (float *)anim_sq->vertices.data;
+  float *normals = (float *)anim_sq->normals.data;
   float *original = (float *)mesh->vertices.data;
+  float *original_normals = (float *)mesh->normals.data;
   for (uint32_t i = 0, size = mesh->vertices.size / 3; i < size; ++i) {
     float total_weight = 0.f;
     uint32_t idx = i * 3;
-    point3f vertex = { original[idx], original[idx + 1], original[idx + 2] };
+    point3f vertex = {
+      original[idx],
+      original[idx + 1],
+      original[idx + 2] };
+    point3f normal = {
+      original_normals[idx],
+      original_normals[idx + 1],
+      original_normals[idx + 2] };
     point3f skinned = { 0.f, 0.f, 0.f };
+    point3f skinned_normal = { 0.f, 0.f, 0.f };
 
     cvector_t *to_bones = cvector_as(&anim_sq->vertex_to_bones, i, cvector_t);
     vertices[i * 3 + 0] = vertices[i * 3 + 1] = vertices[i * 3 + 2] = 0.f;
+    normals[i * 3 + 0] = normals[i * 3 + 1] = normals[i * 3 + 2] = 0.f;
 
     for (uint32_t j = 0; j < to_bones->size; ++j) {
       bone_weight_t *bone_weight = cvector_as(to_bones, j, bone_weight_t);
       matrix4f *final_transform = cvector_as(
         &anim_sq->final_transforms, bone_weight->id, matrix4f);
       point3f intermediate = { 0.f, 0.f, 0.f };
+      matrix4f inverse_transpose = *final_transform;
+      point3f intermediate_normal = { 0.f, 0.f, 0.f };
+
+      inverse_set_m4f(&inverse_transpose);
+      transpose_set_m4f(&inverse_transpose);
 
       intermediate = mult_m4f_p3f(final_transform, &vertex);
       intermediate = mult_v3f(&intermediate, bone_weight->weight);
-      total_weight += bone_weight->weight;
       add_set_v3f(&skinned, &intermediate);
+
+      intermediate_normal = mult_m4f_v3f(&inverse_transpose, &normal);
+      intermediate_normal = mult_v3f(&intermediate_normal, bone_weight->weight);
+      add_set_v3f(&skinned_normal, &intermediate_normal);
+
+      total_weight += bone_weight->weight;
     }
 
     assert(IS_SAME_NP(total_weight, 1.f));
@@ -242,6 +268,13 @@ update_vertices(anim_sequence_t *anim_sq)
     vertices[idx + 0] = skinned.data[0];
     vertices[idx + 1] = skinned.data[1];
     vertices[idx + 2] = skinned.data[2];
+
+    // NOTE: redundant, changes are minimal. But for correctness I kept it.
+    normalize_set_v3f(&skinned_normal);
+
+    normals[idx + 0] = skinned_normal.data[0];
+    normals[idx + 1] = skinned_normal.data[1];
+    normals[idx + 2] = skinned_normal.data[2];
   }
 }
 
@@ -340,4 +373,10 @@ float *
 get_skin(anim_sequence_t *anim_sq)
 {
   return (float *)anim_sq->vertices.data;
+}
+
+float *
+get_skin_normals(anim_sequence_t *anim_sq)
+{
+  return (float *)anim_sq->normals.data;
 }

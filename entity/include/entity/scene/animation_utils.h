@@ -49,6 +49,10 @@ ENTITY_API
 float *
 get_skin(anim_sequence_t *anim_sq);
 
+ENTITY_API
+float *
+get_skin_normals(anim_sequence_t *anim_sq);
+
 #ifdef __cplusplus
 }
 #endif
