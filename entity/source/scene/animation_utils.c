@@ -24,7 +24,6 @@ struct anim_sequence_t {
   skinned_mesh_t *skinned_mesh;
   cvector_t local_transforms;        // node local transforms
   cvector_t final_transforms;        // bone final transforms
-  cvector_t vertex_to_bones;         // cvector_t of cvector_t of bone_weight_t
   cvector_t vertices;
   cvector_t normals;
   const allocator_t *allocator;
@@ -64,30 +63,6 @@ play_anim(
     cvector_resize(
       &anim_sq->final_transforms, skinned_mesh->bones.size);
 
-    cvector_setup(
-      &anim_sq->vertex_to_bones, get_type_data(cvector_t), 0, _alloc);
-    cvector_resize(&anim_sq->vertex_to_bones, mesh->vertices.size / 3);
-
-    for (uint32_t i = 0; i < anim_sq->vertex_to_bones.size; ++i) {
-      cvector_t *inner = cvector_as(&anim_sq->vertex_to_bones, i, cvector_t);
-      cvector_setup(inner, get_type_data(bone_weight_t), 4, _alloc);
-    }
-
-    for (uint32_t i = 0; i < skinned_mesh->bones.size; ++i) {
-      bone_t *bone = cvector_as(&skinned_mesh->bones, i, bone_t);
-
-      for (uint32_t j = 0; j < bone->vertex_weights.size; ++j) {
-        vertex_weight_t *data = cvector_as(
-          &bone->vertex_weights, j, vertex_weight_t);
-
-        cvector_t *vertex_weight = cvector_as(
-          &anim_sq->vertex_to_bones, data->vertex_id, cvector_t);
-
-        bone_weight_t bone_weight = { i, data->weight };
-        cvector_push_back(vertex_weight, bone_weight, bone_weight_t);
-      }
-    }
-
     return anim_sq;
   }
 }
@@ -101,7 +76,6 @@ stop_anim(anim_sequence_t *anim_sq)
     cvector_cleanup2(&anim_sq->normals);
     cvector_cleanup2(&anim_sq->local_transforms);
     cvector_cleanup2(&anim_sq->final_transforms);
-    cvector_cleanup2(&anim_sq->vertex_to_bones);
     _alloc->mem_free(anim_sq);
   }
 }
@@ -212,6 +186,7 @@ update_vertices(anim_sequence_t *anim_sq)
   animation_t *anim = anim_sq->anim;
   skinned_mesh_t *skinned_mesh = anim_sq->skinned_mesh;
   mesh_t *mesh = &skinned_mesh->mesh;
+  cvector_t *vertex_to_bones = &skinned_mesh->vertex_to_bones;
 
   float *vertices = (float *)anim_sq->vertices.data;
   float *normals = (float *)anim_sq->normals.data;
@@ -231,7 +206,7 @@ update_vertices(anim_sequence_t *anim_sq)
     point3f skinned = { 0.f, 0.f, 0.f };
     point3f skinned_normal = { 0.f, 0.f, 0.f };
 
-    cvector_t *to_bones = cvector_as(&anim_sq->vertex_to_bones, i, cvector_t);
+    cvector_t *to_bones = cvector_as(vertex_to_bones, i, cvector_t);
     vertices[i * 3 + 0] = vertices[i * 3 + 1] = vertices[i * 3 + 2] = 0.f;
     normals[i * 3 + 0] = normals[i * 3 + 1] = normals[i * 3 + 2] = 0.f;
 
