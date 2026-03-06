@@ -107,6 +107,7 @@ struct skeleton_t {
   cvector_t nodes;              // skel_node_t
 } skeleton_t;
 
+// NOTE: could probably be removed, potentially superseeded by vertex to bone
 typedef
 struct vertex_weight_t {
   uint32_t vertex_id;
@@ -121,10 +122,17 @@ struct bone_t {
 } bone_t;
 
 typedef
+struct bone_weight_t {
+  uint32_t id;
+  float weight;
+} bone_weight_t;
+
+typedef
 struct skinned_mesh_t {
   mesh_t mesh;
   cvector_t bones;
   skeleton_t skeleton;
+  cvector_t vertex_to_bones;         // cvector_t of cvector_t of bone_weight_t
 } skinned_mesh_t;
 
 ENTITY_API

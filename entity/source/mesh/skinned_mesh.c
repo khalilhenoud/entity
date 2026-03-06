@@ -132,6 +132,7 @@ skinned_mesh_serialize(
     mesh_serialize(&skinned_mesh->mesh, stream);
     cvector_serialize(&skinned_mesh->bones, stream);
     cvector_serialize(&skinned_mesh->skeleton.nodes, stream);
+    cvector_serialize(&skinned_mesh->vertex_to_bones, stream);
   }
 }
 
@@ -193,6 +194,8 @@ skinned_mesh_deserialize(
     cvector_deserialize(&skinned_mesh->bones, allocator, stream);
     cvector_def(&skinned_mesh->skeleton.nodes);
     cvector_deserialize(&skinned_mesh->skeleton.nodes, allocator, stream);
+    cvector_def(&skinned_mesh->vertex_to_bones);
+    cvector_deserialize(&skinned_mesh->vertex_to_bones, allocator, stream);
   }
 }
 
@@ -292,6 +295,7 @@ skinned_mesh_cleanup(
     mesh_cleanup(&skinned_mesh->mesh, allocator);
     cvector_cleanup2(&skinned_mesh->bones);
     cvector_cleanup2(&skinned_mesh->skeleton.nodes);
+    cvector_cleanup2(&skinned_mesh->vertex_to_bones);
     memset(skinned_mesh, 0, sizeof(skinned_mesh_t));
   }
 }

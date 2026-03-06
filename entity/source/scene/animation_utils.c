@@ -19,12 +19,6 @@
 
 
 typedef
-struct bone_weight_t {
-  uint32_t id;
-  float weight;
-} bone_weight_t;
-
-typedef
 struct anim_sequence_t {
   animation_t *anim;
   skinned_mesh_t *skinned_mesh;
