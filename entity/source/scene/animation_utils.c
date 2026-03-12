@@ -272,38 +272,42 @@ update_bone_transforms(
   anim_node_t *channel = find_anim_channel(anim_sq->anim, &node->name);
   matrix4f local_transform = node->transform;
   if (channel) {
-    uint32_t indices;
+    uint32_t index;
     matrix4f s_r_t[3];
     matrix4f_set_identity(s_r_t + 0);
     matrix4f_set_identity(s_r_t + 1);
     matrix4f_set_identity(s_r_t + 2);
 
-    indices = find_scale(channel, anim_time);
-    if (indices != UINT32_MAX) {
-      scale_key_t *k = cvector_as(&channel->scale_keys, indices, scale_key_t);
-      vector3f scale = k->value;
+    index = find_scale(channel, anim_time);
+    if (index != UINT32_MAX) {
+      scale_key_t *k_s = cvector_as(&channel->scale_keys, index++, scale_key_t);
+      scale_key_t *k_e = cvector_as(&channel->scale_keys, index, scale_key_t);
+      float lerp_factor = (anim_time - k_s->time) / (k_e->time - k_s->time);
+      vector3f scale = lerp_v3f(k_s->value, k_e->value, lerp_factor);
       matrix4f_scale(s_r_t + 0, scale.data[0], scale.data[1], scale.data[2]);
     } else
       matrix4f_set_identity(s_r_t + 0);
 
-    indices = find_rotation(channel, anim_time);
-    if (indices != UINT32_MAX) {
-      rotation_key_t *r = cvector_as(
-        &channel->rotation_keys, indices, rotation_key_t);
-      quatf rotation = r->value;
-      vector3f axis;
-      float angle;
-      get_quatf_axis_angle(&rotation, &axis, &angle);
-      angle = TO_DEGREES(angle);
-      matrix4f_set_axisangle(s_r_t + 1, &axis, angle);
+    index = find_rotation(channel, anim_time);
+    if (index != UINT32_MAX) {
+      rotation_key_t *r_s = cvector_as(
+        &channel->rotation_keys, index++, rotation_key_t);
+      rotation_key_t *r_e = cvector_as(
+        &channel->rotation_keys, index, rotation_key_t);
+      float lerp_factor = (anim_time - r_s->time) / (r_e->time - r_s->time);
+      quatf r = slerp_quatf(r_s->value, r_e->value, lerp_factor);
+      s_r_t[1] = quatf_to_matrix4f(r);
     } else
       matrix4f_set_identity(s_r_t + 1);
 
-    indices = find_translation(channel, anim_time);
-    if (indices != UINT32_MAX) {
-      position_key_t *p = cvector_as(
-        &channel->position_keys, indices, position_key_t);
-      vector3f pos = p->value;
+    index = find_translation(channel, anim_time);
+    if (index != UINT32_MAX) {
+      position_key_t *p_s = cvector_as(
+        &channel->position_keys, index++, position_key_t);
+      position_key_t *p_e = cvector_as(
+        &channel->position_keys, index, position_key_t);
+      float lerp_factor = (anim_time - p_s->time) / (p_e->time - p_s->time);
+      vector3f pos = lerp_v3f(p_s->value, p_e->value, lerp_factor);
       matrix4f_translation(s_r_t + 2, pos.data[0], pos.data[1], pos.data[2]);
     } else
       matrix4f_set_identity(s_r_t + 2);
