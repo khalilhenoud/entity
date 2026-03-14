@@ -153,14 +153,18 @@ update_bone_transforms(
   const matrix4f *root_inverse,
   skel_node_t *node,
   const matrix4f *parent_transform,
-  const uint32_t index);
+  const uint32_t index,
+  const uint32_t root_motion);
 
 static
 void
 update_vertices(anim_sequence_t *anim_sq);
 
 void
-update_anim(anim_sequence_t *anim_sq, float delta_t)
+update_anim(
+  anim_sequence_t *anim_sq,
+  float delta_t,
+  uint32_t root_motion)
 {
   animation_t *anim = anim_sq->anim;
   skinned_mesh_t *skinned_mesh = anim_sq->skinned_mesh;
@@ -174,7 +178,13 @@ update_anim(anim_sequence_t *anim_sq, float delta_t)
   matrix4f identity;
   matrix4f_set_identity(&identity);
   update_bone_transforms(
-    anim_sq, anim_time, &root_inverse, root, &identity, 0);
+    anim_sq,
+    anim_time,
+    &root_inverse,
+    root,
+    &identity,
+    0,
+    root_motion);
 
   update_vertices(anim_sq);
 }
@@ -257,7 +267,8 @@ update_bone_transforms(
   const matrix4f *root_inverse,
   skel_node_t *node,
   const matrix4f *parent_transform,
-  const uint32_t index)
+  const uint32_t index,
+  const uint32_t root_motion)
 {
   animation_t *anim = anim_sq->anim;
   skinned_mesh_t *skinned_mesh = anim_sq->skinned_mesh;
@@ -319,6 +330,12 @@ update_bone_transforms(
     }
   }
 
+  if (!root_motion) {
+    local_transform.data[3] = node->transform.data[3];
+    local_transform.data[7] = node->transform.data[7];
+    local_transform.data[11] = node->transform.data[11];
+  }
+
   global_transform = mult_m4f(parent_transform, &local_transform);
   *local = local_transform;
 
@@ -332,7 +349,13 @@ update_bone_transforms(
     uint32_t child_index = *cvector_as(&node->skel_nodes, i, uint32_t);
     skel_node_t *child = cvector_as(&skeleton->nodes, child_index, skel_node_t);
     update_bone_transforms(
-      anim_sq, anim_time, root_inverse, child, &global_transform, child_index);
+      anim_sq,
+      anim_time,
+      root_inverse,
+      child,
+      &global_transform,
+      child_index,
+      root_motion);
   }
 }
 
@@ -352,4 +375,10 @@ float *
 get_skin_normals(anim_sequence_t *anim_sq)
 {
   return (float *)anim_sq->normals.data;
+}
+
+void
+reset_time(anim_sequence_t *anim_sq)
+{
+  anim_sq->time = 0.f;
 }

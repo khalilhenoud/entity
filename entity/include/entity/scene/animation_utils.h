@@ -39,7 +39,7 @@ stop_anim(anim_sequence_t *anim_sq);
 
 ENTITY_API
 void
-update_anim(anim_sequence_t *anim_sq, float delta_t);
+update_anim(anim_sequence_t *anim_sq, float delta_t, uint32_t root_motion);
 
 ENTITY_API
 matrix4f
@@ -52,6 +52,10 @@ get_skin(anim_sequence_t *anim_sq);
 ENTITY_API
 float *
 get_skin_normals(anim_sequence_t *anim_sq);
+
+ENTITY_API
+void
+reset_time(anim_sequence_t *anim_sq);
 
 #ifdef __cplusplus
 }
