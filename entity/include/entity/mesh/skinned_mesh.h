@@ -121,10 +121,11 @@ struct bone_t {
   cvector_t vertex_weights;
 } bone_t;
 
+// TODO: these could be compressed!
 typedef
 struct bone_weight_t {
-  uint32_t id;
-  float weight;
+  uint32_t id[8];
+  float weight[8];
 } bone_weight_t;
 
 typedef
@@ -132,7 +133,7 @@ struct skinned_mesh_t {
   mesh_t mesh;
   cvector_t bones;
   skeleton_t skeleton;
-  cvector_t vertex_to_bones;         // cvector_t of cvector_t of bone_weight_t
+  cvector_t vertex_to_bones;         // cvector_t of bone_weight_t
 } skinned_mesh_t;
 
 ENTITY_API

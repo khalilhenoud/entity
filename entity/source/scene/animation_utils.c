@@ -216,30 +216,36 @@ update_vertices(anim_sequence_t *anim_sq)
     point3f skinned = { 0.f, 0.f, 0.f };
     point3f skinned_normal = { 0.f, 0.f, 0.f };
 
-    cvector_t *to_bones = cvector_as(vertex_to_bones, i, cvector_t);
+    bone_weight_t *to_bones = cvector_as(vertex_to_bones, i, bone_weight_t);
+    const uint32_t bone_size = sizeof(to_bones->id)/sizeof(uint32_t);
     vertices[i * 3 + 0] = vertices[i * 3 + 1] = vertices[i * 3 + 2] = 0.f;
     normals[i * 3 + 0] = normals[i * 3 + 1] = normals[i * 3 + 2] = 0.f;
 
-    for (uint32_t j = 0; j < to_bones->size; ++j) {
-      bone_weight_t *bone_weight = cvector_as(to_bones, j, bone_weight_t);
-      matrix4f *final_transform = cvector_as(
-        &anim_sq->final_transforms, bone_weight->id, matrix4f);
-      point3f intermediate = { 0.f, 0.f, 0.f };
-      matrix4f inverse_transpose = *final_transform;
-      point3f intermediate_normal = { 0.f, 0.f, 0.f };
+    for (uint32_t j = 0; j < bone_size; ++j) {
+      if (to_bones->weight[j] <= 0.f)
+        break;
 
-      inverse_set_m4f(&inverse_transpose);
-      transpose_set_m4f(&inverse_transpose);
+      {
+        matrix4f *final_transform = cvector_as(
+          &anim_sq->final_transforms, to_bones->id[j], matrix4f);
+        point3f intermediate = { 0.f, 0.f, 0.f };
+        matrix4f inverse_transpose = *final_transform;
+        point3f intermediate_normal = { 0.f, 0.f, 0.f };
 
-      intermediate = mult_m4f_p3f(final_transform, &vertex);
-      intermediate = mult_v3f(&intermediate, bone_weight->weight);
-      add_set_v3f(&skinned, &intermediate);
+        inverse_set_m4f(&inverse_transpose);
+        transpose_set_m4f(&inverse_transpose);
 
-      intermediate_normal = mult_m4f_v3f(&inverse_transpose, &normal);
-      intermediate_normal = mult_v3f(&intermediate_normal, bone_weight->weight);
-      add_set_v3f(&skinned_normal, &intermediate_normal);
+        intermediate = mult_m4f_p3f(final_transform, &vertex);
+        intermediate = mult_v3f(&intermediate, to_bones->weight[j]);
+        add_set_v3f(&skinned, &intermediate);
 
-      total_weight += bone_weight->weight;
+        intermediate_normal = mult_m4f_v3f(&inverse_transpose, &normal);
+        intermediate_normal = mult_v3f(
+          &intermediate_normal, to_bones->weight[j]);
+        add_set_v3f(&skinned_normal, &intermediate_normal);
+
+        total_weight += to_bones->weight[j];
+      }
     }
 
     assert(IS_SAME_NP(total_weight, 1.f));
