@@ -43,6 +43,12 @@ extern "C" {
 //|    *_owns_alloc             | YES
 //|    *_get_alloc              | YES
 //|    *_cleanup                | YES
+//|    *_get_dir                |
+//|    *_get_loader             |
+//|    *_get_deloader           |
+//|    *_type_asset_count       |
+//|    *_type_get_assets        |
+//|    *_is_asset_type          |
 ////////////////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -65,6 +71,12 @@ extern "C" {
 //|    *_owns_alloc             | YES
 //|    *_get_alloc              | YES
 //|    *_cleanup                | YES
+//|    *_get_dir                |
+//|    *_get_loader             |
+//|    *_get_deloader           |
+//|    *_type_asset_count       |
+//|    *_type_get_assets        |
+//|    *_is_asset_type          |
 ////////////////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -87,6 +99,12 @@ extern "C" {
 //|    *_owns_alloc             | YES
 //|    *_get_alloc              | YES
 //|    *_cleanup                | YES
+//|    *_get_dir                |
+//|    *_get_loader             |
+//|    *_get_deloader           |
+//|    *_type_asset_count       |
+//|    *_type_get_assets        |
+//|    *_is_asset_type          |
 ////////////////////////////////////////////////////////////////////////////////
 
 typedef struct allocator_t allocator_t;

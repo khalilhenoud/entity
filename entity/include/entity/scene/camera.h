@@ -40,6 +40,12 @@ extern "C" {
 //|    *_owns_alloc             |
 //|    *_get_alloc              |
 //|    *_cleanup                |
+//|    *_get_dir                |
+//|    *_get_loader             |
+//|    *_get_deloader           |
+//|    *_type_asset_count       |
+//|    *_type_get_assets        |
+//|    *_is_asset_type          |
 ////////////////////////////////////////////////////////////////////////////////
 
 typedef struct matrix4f matrix4f;
