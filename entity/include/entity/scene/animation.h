@@ -95,12 +95,6 @@ struct rotation_key_t {
 } rotation_key_t;
 
 typedef
-struct rotation_key2_t {
-  float time;
-  matrix4f value;
-} rotation_key2_t;
-
-typedef
 struct scale_key_t {
   float time;
   vector3f value;

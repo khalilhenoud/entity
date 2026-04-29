@@ -136,7 +136,6 @@ scene_cleanup(
   assert(allocator);
 
   {
-    uint32_t i = 0;
     scene_t *scene = (scene_t *)ptr;
     cstring_cleanup2(&scene->name);
     cvector_cleanup2(&scene->mesh_repo);
