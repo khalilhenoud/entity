@@ -53,7 +53,6 @@ bvh_serialize(
   assert(src && stream);
 
   {
-    uint32_t i = 0;
     const bvh_t *bvh = (const bvh_t *)src;
     cvector_serialize(&bvh->normals, stream);
     cvector_serialize(&bvh->faces, stream);
@@ -71,7 +70,6 @@ bvh_deserialize(
   assert(dst && allocator && stream);
 
   {
-    uint32_t i = 0;
     bvh_t *bvh = (bvh_t *)dst;
     bvh_def(bvh);
     cvector_deserialize(&bvh->normals, allocator, stream);
