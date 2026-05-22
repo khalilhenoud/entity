@@ -21,11 +21,11 @@
 #include <entity/scene/light.h>
 #include <entity/scene/node.h>
 #include <entity/scene/scene.h>
-#include <entity/spatial/bvh.h>
 #include <library/allocator/allocator.h>
 #include <library/core/core.h>
 #include <library/streams/binary_stream.h>
 #include <library/type_registry/type_registry.h>
+#include <spatial/bvh/bvh.h>
 
 
 void

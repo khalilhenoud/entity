@@ -13,7 +13,6 @@ add_library(${PROJECT_NAME} SHARED
         ./source/misc/font.c
         ./source/runtime/font_utils.c
         ./source/runtime/texture_utils.c
-        ./source/spatial/bvh.c
         ./source/scene/animation.c
         ./source/scene/animation_utils.c
         ./source/scene/camera.c
@@ -25,7 +24,8 @@ add_library(${PROJECT_NAME} SHARED
 
 target_link_libraries(${PROJECT_NAME}
         PUBLIC library
-        PUBLIC math)
+        PUBLIC math
+        PUBLIC spatial)
 
 target_include_directories(${PROJECT_NAME} PUBLIC
         "${PROJECT_SOURCE_DIR}/include"

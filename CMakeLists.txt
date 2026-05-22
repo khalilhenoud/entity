@@ -27,16 +27,21 @@ if (NOT HAS_STANDALONE_PREDECESSOR)
     message(FATAL_ERROR "The math submdule was not downloaded!")
   endif()
 
-  # CHECK ALL THE SUBMODULES
   if (NOT EXISTS "${PROJECT_SOURCE_DIR}/external/library/CMakeLists.txt")
     message(FATAL_ERROR "The library submdule was not downloaded!")
   endif()
 
-  #add the subdirectory
+  # TODO: Remove after asset system is decoupled
+  if (NOT EXISTS "${PROJECT_SOURCE_DIR}/external/spatial/CMakeLists.txt")
+    message(FATAL_ERROR "The spatial submdule was not downloaded!")
+  endif()
+
+  #add the subdirectories
   add_subdirectory(external/math math)
 
-  #add the subdirectory
   add_subdirectory(external/library library)
+
+  add_subdirectory(external/spatial spatial)
 endif()
 
 add_subdirectory(entity)
