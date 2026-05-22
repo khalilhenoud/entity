@@ -4,3 +4,6 @@
 [submodule "external/library"]
 	path = external/library
 	url = https://github.com/khalilhenoud/library.git
+[submodule "external/spatial"]
+	path = external/spatial
+	url = https://github.com/khalilhenoud/spatial.git
