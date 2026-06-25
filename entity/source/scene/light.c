@@ -175,17 +175,17 @@ light_setup(
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-INITIALIZER(register_light_t)
-{
-  vtable_t vtable;
-  memset(&vtable, 0, sizeof(vtable_t));
-  vtable.fn_def = light_def;
-  vtable.fn_is_def = light_is_def;
-  vtable.fn_serialize = light_serialize;
-  vtable.fn_deserialize = light_deserialize;
-  vtable.fn_type_size = light_type_size;
-  vtable.fn_owns_alloc = light_owns_alloc;
-  vtable.fn_get_alloc = light_get_alloc;
-  vtable.fn_cleanup = light_cleanup;
-  register_type(get_type_id(light_t), &vtable);
-}
+// INITIALIZER(register_light_t)
+// {
+//   vtable_t vtable;
+//   memset(&vtable, 0, sizeof(vtable_t));
+//   vtable.fn_def = light_def;
+//   vtable.fn_is_def = light_is_def;
+//   vtable.fn_serialize = light_serialize;
+//   vtable.fn_deserialize = light_deserialize;
+//   vtable.fn_type_size = light_type_size;
+//   vtable.fn_owns_alloc = light_owns_alloc;
+//   vtable.fn_get_alloc = light_get_alloc;
+//   vtable.fn_cleanup = light_cleanup;
+//   register_type(get_type_id(light_t), &vtable);
+// }

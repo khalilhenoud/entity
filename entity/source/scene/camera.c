@@ -165,14 +165,14 @@ camera_view_matrix(
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-INITIALIZER(register_camera_t)
-{
-  vtable_t vtable;
-  memset(&vtable, 0, sizeof(vtable_t));
-  vtable.fn_def = camera_def;
-  vtable.fn_is_def = camera_is_def;
-  vtable.fn_serialize = camera_serialize;
-  vtable.fn_deserialize = camera_deserialize;
-  vtable.fn_type_size = camera_type_size;
-  register_type(get_type_id(camera_t), &vtable);
-}
+// INITIALIZER(register_camera_t)
+// {
+//   vtable_t vtable;
+//   memset(&vtable, 0, sizeof(vtable_t));
+//   vtable.fn_def = camera_def;
+//   vtable.fn_is_def = camera_is_def;
+//   vtable.fn_serialize = camera_serialize;
+//   vtable.fn_deserialize = camera_deserialize;
+//   vtable.fn_type_size = camera_type_size;
+//   register_type(get_type_id(camera_t), &vtable);
+// }
