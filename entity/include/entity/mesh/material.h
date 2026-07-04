@@ -17,8 +17,8 @@ extern "C" {
 
 #include <stdint.h>
 #include <entity/internal/module.h>
-#include <entity/mesh/color.h>
 #include <library/string/cstring.h>
+#include <props/color.h>
 
 #define MAX_TEXTURE_COUNT_PER_MATERIAL          8
 

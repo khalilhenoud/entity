@@ -17,9 +17,9 @@ extern "C" {
 
 #include <stdint.h>
 #include <entity/internal/module.h>
-#include <entity/mesh/color.h>
 #include <library/string/cstring.h>
 #include <math/vector3f.h>
+#include <props/color.h>
 
 
 ////////////////////////////////////////////////////////////////////////////////

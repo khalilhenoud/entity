@@ -17,14 +17,14 @@
 #include <entity/mesh/texture.h>
 #include <entity/misc/font.h>
 #include <entity/scene/animation.h>
-#include <entity/scene/camera.h>
-#include <entity/scene/light.h>
 #include <entity/scene/node.h>
 #include <entity/scene/scene.h>
 #include <library/allocator/allocator.h>
 #include <library/core/core.h>
 #include <library/streams/binary_stream.h>
 #include <library/type_registry/type_registry.h>
+#include <props/camera.h>
+#include <props/light.h>
 #include <spatial/bvh/bvh.h>
 
 
