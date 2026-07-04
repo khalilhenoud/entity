@@ -15,8 +15,6 @@ add_library(${PROJECT_NAME} SHARED
         ./source/runtime/texture_utils.c
         ./source/scene/animation.c
         ./source/scene/animation_utils.c
-        ./source/scene/camera.c
-        ./source/scene/light.c
         ./source/scene/node.c
         ./source/scene/scene.c
         ./include/entity/internal/module.h
