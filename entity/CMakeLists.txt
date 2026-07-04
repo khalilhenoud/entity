@@ -25,7 +25,8 @@ add_library(${PROJECT_NAME} SHARED
 target_link_libraries(${PROJECT_NAME}
         PUBLIC library
         PUBLIC math
-        PUBLIC spatial)
+        PUBLIC spatial
+        PUBLIC props)
 
 target_include_directories(${PROJECT_NAME} PUBLIC
         "${PROJECT_SOURCE_DIR}/include"

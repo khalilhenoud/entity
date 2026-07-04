@@ -36,12 +36,17 @@ if (NOT HAS_STANDALONE_PREDECESSOR)
     message(FATAL_ERROR "The spatial submdule was not downloaded!")
   endif()
 
+  # TODO: Remove after asset system is decoupled
+  if (NOT EXISTS "${PROJECT_SOURCE_DIR}/external/props/CMakeLists.txt")
+    message(FATAL_ERROR "The props submdule was not downloaded!")
+  endif()
+
+
   #add the subdirectories
   add_subdirectory(external/math math)
-
   add_subdirectory(external/library library)
-
   add_subdirectory(external/spatial spatial)
+  add_subdirectory(external/props props)
 endif()
 
 add_subdirectory(entity)
