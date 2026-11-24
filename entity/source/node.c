@@ -10,7 +10,7 @@
  */
 #include <assert.h>
 #include <string.h>
-#include <entity/scene/node.h>
+#include <entity/node.h>
 #include <library/allocator/allocator.h>
 #include <library/core/core.h>
 #include <library/type_registry/type_registry.h>
